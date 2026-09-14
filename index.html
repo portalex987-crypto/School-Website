@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0e1a;
+    --panel: #141a2e;
+    --panel-hover: #1c2440;
+    --line: #2a3357;
+    --cyan: #33fff0;
+    --pink: #ff2e88;
+    --text: #eef1fa;
+    --muted: #6d7597;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(circle at 15% 0%, rgba(51,255,240,0.07), transparent 40%),
+      radial-gradient(circle at 85% 100%, rgba(255,46,136,0.07), transparent 40%),
+      var(--bg);
+    color: var(--text);
+    font-family: 'Rubik', sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 56px 24px 80px;
+  }
+
+  .layout {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+  }
+
+  header {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  h1 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1.6rem;
+    line-height: 1.4;
+    margin: 0;
+    color: var(--cyan);
+    text-shadow: 0 0 12px rgba(51,255,240,0.5);
+  }
+
+  p.subtitle {
+    margin: 0;
+    color: var(--muted);
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  ul.game-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+  }
+
+  ul.game-list li {
+    aspect-ratio: 1 / 1;
+  }
+
+  .game-button {
+    width: 100%;
+    height: 100%;
+    background: var(--panel);
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    color: var(--muted);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease, color 0.15s ease;
+  }
+
+  .game-button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(51,255,240,0.12), rgba(255,46,136,0.12));
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  .game-button:hover,
+  .game-button:focus-visible {
+    border-color: var(--cyan);
+    color: var(--text);
+    outline: none;
+    transform: translateY(-2px);
+  }
+
+  .game-button:hover::before,
+  .game-button:focus-visible::before {
+    opacity: 1;
+  }
+
+  .game-button:focus-visible {
+    box-shadow: 0 0 0 3px rgba(51,255,240,0.35);
+  }
+
+  .game-button.active {
+    border-color: var(--pink);
+    color: var(--text);
+    box-shadow: 0 0 16px rgba(255,46,136,0.35);
+  }
+
+  .slot-icon {
+    width: 30px;
+    height: 30px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.6;
+    position: relative;
+    z-index: 1;
+  }
+
+  .slot-number {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+    position: relative;
+    z-index: 1;
+  }
+
+  .slot-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    position: relative;
+    z-index: 1;
+  }
+
+  .player {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .player-label {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.7rem;
+    color: var(--pink);
+    letter-spacing: 0.05em;
+  }
+
+  .player-frame-wrap {
+    border: 2px solid var(--line);
+    border-radius: 14px;
+    background: var(--panel);
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    display: flex;
+    box-shadow: 0 0 30px rgba(0,0,0,0.4) inset;
+  }
+
+  .player-frame-wrap iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .placeholder {
+    margin: auto;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.95rem;
+    padding: 24px;
+  }
+
+  @media (max-width: 900px) {
+    ul.game-list {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  @media (max-width: 600px) {
+    ul.game-list {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    h1 {
+      font-size: 1.1rem;
+    }
+  }
+
+  @media (max-width: 400px) {
+    ul.game-list {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <header>
+    <h1>GAME HUB</h1>
+    <p class="subtitle">50 slots loaded. Pick a cartridge to play.</p>
+  </header>
+
+  <ul class="game-list" id="gameList"></ul>
+
+  <div class="player">
+    <div class="player-label">NOW PLAYING</div>
+    <div class="player-frame-wrap" id="playerFrameWrap">
+      <p class="placeholder" id="placeholder">Select a slot above to start playing</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const TOTAL_GAMES = 50;
+  const list = document.getElementById('gameList');
+  const wrap = document.getElementById('playerFrameWrap');
+
+  const controllerIcon = `
+    <svg class="slot-icon" viewBox="0 0 24 24">
+      <path d="M6 9h2M7 8v2M14 9h.01M17 11h.01" stroke-linecap="round"/>
+      <path d="M7.5 6h9a4 4 0 0 1 3.98 4.4l-.6 5.6a2.4 2.4 0 0 1-4.2 1.4l-1.1-1.4H8.42l-1.1 1.4a2.4 2.4 0 0 1-4.2-1.4l-.6-5.6A4 4 0 0 1 6.5 6h1z" stroke-linejoin="round"/>
+    </svg>
+  `;
+
+  for (let i = 1; i <= TOTAL_GAMES; i++) {
+    const num = String(i).padStart(2, '0');
+    const li = document.createElement('li');
+    const btn = document.createElement('button');
+    btn.className = 'game-button';
+    btn.dataset.src = `games/game-${num}.html`;
+    btn.innerHTML = `
+      ${controllerIcon}
+      <span class="slot-number">${num}</span>
+      <span class="slot-label">Empty</span>
+    `;
+    li.appendChild(btn);
+    list.appendChild(li);
+  }
+
+  const buttons = document.querySelectorAll('.game-button');
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      buttons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      wrap.innerHTML = '';
+      const iframe = document.createElement('iframe');
+      iframe.src = btn.dataset.src;
+      iframe.setAttribute('title', 'Game ' + btn.querySelector('.slot-number').textContent);
+      iframe.setAttribute('allowfullscreen', '');
+      wrap.appendChild(iframe);
+    });
+  });
+</script>
+
+</body>
+</html>

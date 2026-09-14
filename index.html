@@ -211,6 +211,127 @@
       grid-template-columns: repeat(2, 1fr);
     }
   }
+  /* AI Assistant (Game 03) */
+  #aiGame {
+    width: 100%;
+    height: 100%;
+    min-height: 420px;
+    background: #0b0e1a;
+    color: #eef1fa;
+    display: flex;
+    flex-direction: column;
+  }
+  #aiGame header {
+    padding: 14px 18px;
+    border-bottom: 1px solid #2a3357;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-direction: row;
+  }
+  #aiGame header .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ff2e88;
+    box-shadow: 0 0 8px #ff2e88;
+  }
+  #aiGame header h1 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.7rem;
+    margin: 0;
+    color: #ff2e88;
+    text-shadow: none;
+  }
+  #aiGame header .status {
+    margin-left: auto;
+    font-size: 0.8rem;
+    color: #6d7597;
+  }
+  #aiGame #aiLog {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 260px;
+  }
+  #aiGame .msg {
+    max-width: 75%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 0.92rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+  }
+  #aiGame .msg .sender {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-bottom: 3px;
+    opacity: 0.75;
+  }
+  #aiGame .msg.me {
+    align-self: flex-end;
+    background: #33fff0;
+    color: #04211f;
+    border-bottom-right-radius: 4px;
+  }
+  #aiGame .msg.them {
+    align-self: flex-start;
+    background: #1c2440;
+    color: #eef1fa;
+    border: 1px solid #2a3357;
+    border-bottom-left-radius: 4px;
+  }
+  #aiGame .msg.typing { color: #6d7597; font-style: italic; }
+  #aiGame form {
+    display: flex;
+    gap: 10px;
+    padding: 14px;
+    border-top: 1px solid #2a3357;
+    background: #141a2e;
+  }
+  #aiGame input[type="text"] {
+    flex: 1;
+    background: #0b0e1a;
+    border: 1px solid #2a3357;
+    border-radius: 8px;
+    color: #eef1fa;
+    padding: 12px 14px;
+    font-family: 'Rubik', sans-serif;
+    font-size: 0.95rem;
+  }
+  #aiGame input[type="text"]:focus { outline: none; border-color: #ff2e88; }
+  #aiGame button {
+    background: #ff2e88;
+    color: #22030f;
+    border: none;
+    border-radius: 8px;
+    padding: 0 18px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Rubik', sans-serif;
+  }
+  #aiGame button:hover { background: #ff5da3; }
+  #aiGame button:disabled { opacity: 0.5; cursor: not-allowed; }
+  #aiGame .setup-warning {
+    margin: auto;
+    max-width: 440px;
+    text-align: center;
+    padding: 24px;
+    color: #6d7597;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  #aiGame .setup-warning code {
+    background: #141a2e;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #ff2e88;
+  }
 </style>
 </head>
 <body>
@@ -241,7 +362,7 @@
   const gameNames = [
     "Ages of Conflict", // 01
     "BitLife", // 02
-    "Super Liquid Soccer", // 03
+    "AI Assistant", // 03
     "Core Ball", // 04
     "Drive Mad", // 05
     "Fnaf", // 06
@@ -297,7 +418,7 @@
   const gameLinks = [
     "https://4yqt7wrhtx-ship-it.github.io/casual-games/ages-of-conflict/", // 01
     "https://4yqt7wrhtx-ship-it.github.io/strategy-games/bitlife/", // 02
-    "https://4yqt7wrhtx-ship-it.github.io/driving-games/super-liquid-soccer/", // 03
+    "", // 03
     "https://4yqt7wrhtx-ship-it.github.io/casual-games/core-ball/", // 04
     "https://4yqt7wrhtx-ship-it.github.io/driving-games/drive-mad/", // 05
     "https://4yqt7wrhtx-ship-it.github.io/action-games/fnaf/", // 06
@@ -378,11 +499,241 @@
       btn.classList.add('active');
 
       wrap.innerHTML = '';
-      const iframe = document.createElement('iframe');
-      iframe.src = btn.dataset.src;
-      iframe.setAttribute('title', 'Game ' + btn.querySelector('.slot-number').textContent);
-      iframe.setAttribute('allowfullscreen', '');
-      wrap.appendChild(iframe);
+
+      // Game 03 is the built-in AI Assistant from game03.html.
+      if (btn.querySelector('.slot-number').textContent === '03') {
+        const aiGame = document.createElement('div');
+        aiGame.id = 'aiGame';
+        aiGame.innerHTML = `
+
+<header>
+  <span class="dot"></span>
+  <h1>GABE THE GOONER</h1>
+  <span class="status" id="statusLabel">idle</span>
+</header>
+
+<div id="log"></div>
+
+<form id="chatForm">
+  <input type="text" id="messageInput" placeholder="Say something to Gabe..." autocomplete="off" required>
+  <button type="submit" id="sendBtn">Send</button>
+</form>
+
+<script>
+  // ======================================================
+  // PASTE YOUR OWN OPENAI API KEY BELOW.
+  // Get one from platform.openai.com/api-keys
+  // WARNING: this key is visible to anyone who views this
+  // page's source. Set a spending limit in your OpenAI
+  // account so this can't run up unexpected charges.
+  // ======================================================
+  const OPENAI_API_KEY = "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";
+
+  // Cheaper, faster model -- good for a casual chat companion.
+  const MODEL = "gpt-4o-mini";
+
+  const SYSTEM_PROMPT =
+    "You are Gabe, a friendly, funny, upbeat chat companion living on a " +
+    "retro game hub website. Keep replies short and casual, like texting " +
+    "a buddy. Never claim to be a real person.";
+
+  const log = document.getElementById('log');
+  const form = document.getElementById('chatForm');
+  const input = document.getElementById('messageInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const statusLabel = document.getElementById('statusLabel');
+
+  const isConfigured = OPENAI_API_KEY !== "YOUR_API_KEY_HERE";
+  let history = [{ role: 'system', content: SYSTEM_PROMPT }];
+
+  function addMessage(text, sender, isTyping) {
+    const div = document.createElement('div');
+    div.className = 'msg ' + (sender === 'me' ? 'me' : 'them') + (isTyping ? ' typing' : '');
+    const senderSpan = document.createElement('span');
+    senderSpan.className = 'sender';
+    senderSpan.textContent = sender === 'me' ? 'You' : 'Gabe';
+    div.appendChild(senderSpan);
+    div.appendChild(document.createTextNode(text));
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+    return div;
+  }
+
+  if (!isConfigured) {
+    statusLabel.textContent = 'not set up';
+    log.innerHTML = \`
+      <div class="setup-warning">
+        Gabe isn't connected yet.<br><br>
+        Open <code>game-03.html</code> and replace
+        <code>YOUR_API_KEY_HERE</code> with your own OpenAI API key,
+        then reload this page.
+      </div>
+    \`;
+    form.style.display = 'none';
+  } else {
+    statusLabel.textContent = 'online';
+    addMessage("Hey! I'm Gabe. What's up?", 'them');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+
+      addMessage(text, 'me');
+      history.push({ role: 'user', content: text });
+      input.value = '';
+      sendBtn.disabled = true;
+
+      const typingEl = addMessage('typing...', 'them', true);
+      statusLabel.textContent = 'thinking...';
+
+      try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + OPENAI_API_KEY
+          },
+          body: JSON.stringify({
+            model: MODEL,
+            max_tokens: 300,
+            messages: history
+          })
+        });
+
+        const data = await response.json();
+        typingEl.remove();
+
+        if (data.error) {
+          addMessage('Error: ' + data.error.message, 'them');
+        } else {
+          const reply = data.choices[0].message.content;
+          addMessage(reply, 'them');
+          history.push({ role: 'assistant', content: reply });
+        }
+      } catch (err) {
+        typingEl.remove();
+        addMessage('Something went wrong reaching Gabe. Check your API key and connection.', 'them');
+      }
+
+      statusLabel.textContent = 'online';
+      sendBtn.disabled = false;
+      input.focus();
+    });
+  }
+</script>
+
+`;
+        wrap.appendChild(aiGame);
+
+        const aiScript = document.createElement('script');
+        aiScript.textContent = `
+  // ======================================================
+  // Keep your OpenAI API key on a server, never in this GitHub Pages file.
+  // Your backend should expose POST /api/chat and call OpenAI securely.
+  const AI_ENDPOINT = "/api/chat";
+
+  // Cheaper, faster model -- good for a casual chat companion.
+  const MODEL = "gpt-4o-mini";
+
+  const SYSTEM_PROMPT =
+    "You are Gabe, a friendly, funny, upbeat chat companion living on a " +
+    "retro game hub website. Keep replies short and casual, like texting " +
+    "a buddy. Never claim to be a real person.";
+
+  const log = document.getElementById('log');
+  const form = document.getElementById('chatForm');
+  const input = document.getElementById('messageInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const statusLabel = document.getElementById('statusLabel');
+
+  const isConfigured = AI_ENDPOINT !== "";
+  let history = [{ role: 'system', content: SYSTEM_PROMPT }];
+
+  function addMessage(text, sender, isTyping) {
+    const div = document.createElement('div');
+    div.className = 'msg ' + (sender === 'me' ? 'me' : 'them') + (isTyping ? ' typing' : '');
+    const senderSpan = document.createElement('span');
+    senderSpan.className = 'sender';
+    senderSpan.textContent = sender === 'me' ? 'You' : 'Gabe';
+    div.appendChild(senderSpan);
+    div.appendChild(document.createTextNode(text));
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+    return div;
+  }
+
+  if (!isConfigured) {
+    statusLabel.textContent = 'not set up';
+    log.innerHTML = \`
+      <div class="setup-warning">
+        Gabe isn't connected yet.<br><br>
+        Open <code>game-03.html</code> and replace
+        <code>YOUR_API_KEY_HERE</code> with your own OpenAI API key,
+        then reload this page.
+      </div>
+    \`;
+    form.style.display = 'none';
+  } else {
+    statusLabel.textContent = 'online';
+    addMessage("Hey! I'm Gabe. What's up?", 'them');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+
+      addMessage(text, 'me');
+      history.push({ role: 'user', content: text });
+      input.value = '';
+      sendBtn.disabled = true;
+
+      const typingEl = addMessage('typing...', 'them', true);
+      statusLabel.textContent = 'thinking...';
+
+      try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + OPENAI_API_KEY
+          },
+          body: JSON.stringify({
+            model: MODEL,
+            max_tokens: 300,
+            messages: history
+          })
+        });
+
+        const data = await response.json();
+        typingEl.remove();
+
+        if (data.error) {
+          addMessage('Error: ' + data.error.message, 'them');
+        } else {
+          const reply = data.choices[0].message.content;
+          addMessage(reply, 'them');
+          history.push({ role: 'assistant', content: reply });
+        }
+      } catch (err) {
+        typingEl.remove();
+        addMessage('Something went wrong reaching Gabe. Check your API key and connection.', 'them');
+      }
+
+      statusLabel.textContent = 'online';
+      sendBtn.disabled = false;
+      input.focus();
+    });
+  }
+`;
+        aiGame.appendChild(aiScript);
+      } else {
+        const iframe = document.createElement('iframe');
+        iframe.src = btn.dataset.src;
+        iframe.setAttribute('title', 'Game ' + btn.querySelector('.slot-number').textContent);
+        iframe.setAttribute('allowfullscreen', '');
+        wrap.appendChild(iframe);
+      }
     });
   });
 </script>

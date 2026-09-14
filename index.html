@@ -236,6 +236,61 @@
   const list = document.getElementById('gameList');
   const wrap = document.getElementById('playerFrameWrap');
 
+  // Fill in a name between the quotes to label that slot.
+  // Leave it as "" to keep showing "Empty" for that number.
+  const gameNames = [
+    "Ages Of Conflict", // 01
+    "BitLife", // 02
+    "Learn To Fly 2", // 03
+    "Among us", // 04
+    "Core Ball", // 05
+    "COMING SOON!", // 06
+    "COMING SOON!", // 07
+    "COMING SOON!", // 08
+    "COMING SOON!", // 09
+    "COMING SOON!", // 10
+    "COMING SOON!", // 11
+    "COMING SOON!", // 12
+    "COMING SOON!", // 13
+    "COMING SOON!", // 14
+    "COMING SOON!", // 15
+    "COMING SOON!", // 16
+    "COMING SOON!", // 17
+    "COMING SOON!", // 18
+    "COMING SOON!", // 19
+    "COMING SOON!", // 20
+    "COMING SOON!", // 21
+    "COMING SOON!", // 22
+    "COMING SOON!", // 23
+    "COMING SOON!", // 24
+    "COMING SOON!", // 25
+    "COMING SOON!", // 26
+    "COMING SOON!", // 27
+    "COMING SOON!", // 28
+    "COMING SOON!", // 29
+    "COMING SOON!", // 30
+    "COMING SOON!", // 31
+    "COMING SOON!", // 32
+    "COMING SOON!", // 33
+    "COMING SOON!", // 34
+    "COMING SOON!", // 35
+    "COMING SOON!", // 36
+    "COMING SOON!", // 37
+    "COMING SOON!", // 38
+    "COMING SOON!", // 39
+    "COMING SOON!", // 40
+    "COMING SOON!", // 41
+    "COMING SOON!", // 42
+    "COMING SOON!", // 43
+    "COMING SOON!", // 44
+    "COMING SOON!", // 45
+    "COMING SOON!", // 46
+    "COMING SOON!", // 47
+    "COMING SOON!", // 48
+    "COMING SOON!", // 49
+    "COMING SOON!"  // 50
+  ];
+
   const controllerIcon = `
     <svg class="slot-icon" viewBox="0 0 24 24">
       <path d="M6 9h2M7 8v2M14 9h.01M17 11h.01" stroke-linecap="round"/>
@@ -245,6 +300,7 @@
 
   for (let i = 1; i <= TOTAL_GAMES; i++) {
     const num = String(i).padStart(2, '0');
+    const label = gameNames[i - 1] || 'Empty';
     const li = document.createElement('li');
     const btn = document.createElement('button');
     btn.className = 'game-button';
@@ -252,7 +308,7 @@
     btn.innerHTML = `
       ${controllerIcon}
       <span class="slot-number">${num}</span>
-      <span class="slot-label">Empty</span>
+      <span class="slot-label">${label}</span>
     `;
     li.appendChild(btn);
     list.appendChild(li);

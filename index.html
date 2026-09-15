@@ -8,29 +8,70 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0b0e1a;
-    --panel: #141a2e;
-    --panel-hover: #1c2440;
-    --line: #2a3357;
+    --bg: #07060d;
+    --panel: #171226;
+    --panel-hover: #211a38;
+    --line: #3a2f5c;
     --cyan: #33fff0;
     --pink: #ff2e88;
-    --text: #eef1fa;
-    --muted: #6d7597;
+    --gold: #ffcf4d;
+    --text: #f3f1fb;
+    --muted: #8b84ab;
   }
 
   * { box-sizing: border-box; }
 
+  html { background: var(--bg); }
+
   body {
     margin: 0;
+    position: relative;
+    min-height: 100vh;
     background:
-      radial-gradient(circle at 15% 0%, rgba(51,255,240,0.07), transparent 40%),
-      radial-gradient(circle at 85% 100%, rgba(255,46,136,0.07), transparent 40%),
-      var(--bg);
+      radial-gradient(circle at 15% 0%, rgba(51,255,240,0.10), transparent 45%),
+      radial-gradient(circle at 85% 15%, rgba(255,46,136,0.10), transparent 45%),
+      linear-gradient(180deg, var(--bg) 0%, #0d0a1a 60%, #150e26 100%);
     color: var(--text);
     font-family: 'Rubik', sans-serif;
     display: flex;
     justify-content: center;
-    padding: 56px 24px 80px;
+    padding: 48px 24px 90px;
+    overflow-x: hidden;
+  }
+
+  /* retro floor grid glowing at the bottom of the page */
+  body::before {
+    content: '';
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    height: 45vh;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(51,255,240,0.16) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(51,255,240,0.16) 1px, transparent 1px);
+    background-size: 48px 48px;
+    transform: perspective(400px) rotateX(60deg);
+    transform-origin: bottom;
+    mask-image: linear-gradient(to top, black, transparent);
+    -webkit-mask-image: linear-gradient(to top, black, transparent);
+    opacity: 0.5;
+    z-index: 0;
+  }
+
+  /* scanline overlay for a CRT feel */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(0,0,0,0) 0px,
+      rgba(0,0,0,0) 2px,
+      rgba(0,0,0,0.10) 3px
+    );
+    z-index: 1;
+    mix-blend-mode: overlay;
   }
 
   .layout {
@@ -38,29 +79,78 @@
     max-width: 1200px;
     display: flex;
     flex-direction: column;
-    gap: 36px;
+    gap: 40px;
+    position: relative;
+    z-index: 2;
   }
 
   header {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+    padding: 22px 20px 26px;
+    background: linear-gradient(180deg, var(--panel) 0%, rgba(23,18,38,0.4) 100%);
+    border: 3px solid var(--line);
+    border-radius: 16px;
+    box-shadow:
+      0 0 0 3px rgba(51,255,240,0.08),
+      0 0 30px rgba(51,255,240,0.12),
+      inset 0 0 40px rgba(255,46,136,0.06);
+    position: relative;
   }
+
+  header::before,
+  header::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 8px var(--gold);
+  }
+
+  header::before { left: 14px; }
+  header::after { right: 14px; }
 
   h1 {
     font-family: 'Press Start 2P', monospace;
-    font-size: 1.6rem;
-    line-height: 1.4;
+    font-size: 1.9rem;
+    line-height: 1.5;
     margin: 0;
     color: var(--cyan);
-    text-shadow: 0 0 12px rgba(51,255,240,0.5);
+    letter-spacing: 0.04em;
+    text-shadow:
+      0 0 8px rgba(51,255,240,0.8),
+      0 0 22px rgba(51,255,240,0.5),
+      0 0 2px #fff;
+    animation: flicker 4s infinite;
+  }
+
+  @keyframes flicker {
+    0%, 96%, 100% { opacity: 1; }
+    97% { opacity: 0.82; }
+    98% { opacity: 1; }
+    99% { opacity: 0.88; }
   }
 
   p.subtitle {
     margin: 0;
-    color: var(--muted);
-    font-size: 1rem;
-    font-weight: 500;
+    color: var(--gold);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.6rem;
+    animation: blink 1.4s steps(1) infinite;
+  }
+
+  @keyframes blink {
+    0%, 60% { opacity: 1; }
+    61%, 100% { opacity: 0.25; }
   }
 
   ul.game-list {
@@ -69,7 +159,7 @@
     padding: 0;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 16px;
+    gap: 18px;
   }
 
   ul.game-list li {
@@ -79,26 +169,34 @@
   .game-button {
     width: 100%;
     height: 100%;
-    background: var(--panel);
+    background:
+      linear-gradient(155deg, var(--panel-hover) 0%, var(--panel) 60%);
     border: 2px solid var(--line);
-    border-radius: 12px;
+    border-radius: 10px;
+    clip-path: polygon(
+      12px 0, 100% 0, 100% calc(100% - 12px),
+      calc(100% - 12px) 100%, 0 100%, 0 12px
+    );
     cursor: pointer;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     color: var(--muted);
     position: relative;
     overflow: hidden;
-    transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease, color 0.15s ease;
+    box-shadow:
+      0 4px 0 rgba(0,0,0,0.45),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease, color 0.15s ease, box-shadow 0.15s ease;
   }
 
   .game-button::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(51,255,240,0.12), rgba(255,46,136,0.12));
+    background: linear-gradient(135deg, rgba(51,255,240,0.18), rgba(255,46,136,0.18));
     opacity: 0;
     transition: opacity 0.15s ease;
   }
@@ -108,12 +206,23 @@
     border-color: var(--cyan);
     color: var(--text);
     outline: none;
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow:
+      0 6px 0 rgba(0,0,0,0.45),
+      0 0 18px rgba(51,255,240,0.45),
+      inset 0 1px 0 rgba(255,255,255,0.08);
   }
 
   .game-button:hover::before,
   .game-button:focus-visible::before {
     opacity: 1;
+  }
+
+  .game-button:active {
+    transform: translateY(0px);
+    box-shadow:
+      0 1px 0 rgba(0,0,0,0.45),
+      inset 0 1px 0 rgba(255,255,255,0.05);
   }
 
   .game-button:focus-visible {
@@ -123,64 +232,89 @@
   .game-button.active {
     border-color: var(--pink);
     color: var(--text);
-    box-shadow: 0 0 16px rgba(255,46,136,0.35);
+    box-shadow:
+      0 6px 0 rgba(0,0,0,0.45),
+      0 0 20px rgba(255,46,136,0.5),
+      inset 0 1px 0 rgba(255,255,255,0.08);
   }
 
   .slot-icon {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     stroke: currentColor;
     fill: none;
     stroke-width: 1.6;
     position: relative;
     z-index: 1;
+    filter: drop-shadow(0 0 4px currentColor);
   }
 
   .slot-number {
     font-family: 'Press Start 2P', monospace;
-    font-size: 0.6rem;
+    font-size: 0.62rem;
     letter-spacing: 0.05em;
     position: relative;
     z-index: 1;
+    color: var(--gold);
   }
 
   .slot-label {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
     color: var(--muted);
     position: relative;
     z-index: 1;
+    text-align: center;
+    padding: 0 6px;
   }
 
   .player {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
   }
 
   .player-label {
     font-family: 'Press Start 2P', monospace;
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     color: var(--pink);
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
+    text-shadow: 0 0 8px rgba(255,46,136,0.6);
   }
 
+  /* arcade-cabinet screen bezel */
   .player-frame-wrap {
-    border: 2px solid var(--line);
-    border-radius: 14px;
+    border: 10px solid #1a1526;
+    border-radius: 20px;
     background: var(--panel);
     overflow: hidden;
     aspect-ratio: 16 / 9;
     display: flex;
-    box-shadow: 0 0 30px rgba(0,0,0,0.4) inset;
+    box-shadow:
+      0 0 0 2px var(--line),
+      0 0 40px rgba(51,255,240,0.15),
+      inset 0 0 40px rgba(0,0,0,0.6);
+    position: relative;
+  }
+
+  .player-frame-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    box-shadow: inset 0 0 60px rgba(0,0,0,0.5);
+    border-radius: 10px;
+    z-index: 5;
   }
 
   .player-frame-wrap iframe {
     width: 100%;
     height: 100%;
     border: none;
+    position: relative;
+    z-index: 1;
   }
 
   .placeholder {
@@ -189,6 +323,8 @@
     color: var(--muted);
     font-size: 0.95rem;
     padding: 24px;
+    position: relative;
+    z-index: 1;
   }
 
   @media (max-width: 900px) {
@@ -202,7 +338,7 @@
       grid-template-columns: repeat(3, 1fr);
     }
     h1 {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
     }
   }
 
@@ -380,8 +516,8 @@
 
 <div class="layout">
   <header>
-    <h1>GAME HUB</h1>
-    <p class="subtitle">50 slots loaded. Pick a cartridge to play.</p>
+    <h1>ARCADE GAMES</h1>
+    <p class="subtitle">Insert Coin — 50 Cartridges Loaded</p>
   </header>
 
   <ul class="game-list" id="gameList"></ul>
@@ -410,7 +546,7 @@
     "Fnaf", // 06
     "Super Liquid Soccer", // 07
     "Learn To Fly 2", // 08
-    "COMING SOON!", // 09
+    "MineCraft!", // 09
     "COMING SOON!", // 10
     "COMING SOON!", // 11
     "COMING SOON!", // 12
@@ -466,7 +602,7 @@
     "https://4yqt7wrhtx-ship-it.github.io/action-games/fnaf/", // 06
     "https://4yqt7wrhtx-ship-it.github.io/driving-games/super-liquid-soccer/", // 07
     "https://4yqt7wrhtx-ship-it.github.io/casual-games/learn-to-fly-2/", // 08
-    "", // 09
+    "https://4yqt7wrhtx-ship-it.github.io/action-games/minecraft-15/", // 09
     "", // 10
     "", // 11
     "", // 12
@@ -572,7 +708,7 @@
         const script = document.createElement('script');
         script.textContent = `
 (function () {
-  const OPENAI_API_KEY = "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"; // Intentionally empty: the key stays on the backend.
+  const OPENAI_API_KEY = ""; // Intentionally empty: the key stays on the backend.
   const AI_ENDPOINT = "https://gabe-ai-backend.portalex987.workers.dev/api/chat";
 
   const SYSTEM_PROMPT =

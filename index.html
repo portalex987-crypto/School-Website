@@ -613,9 +613,138 @@
   }
 
   .swatch-row {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 10px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 4px 2px 8px;
+    overflow: hidden;
+  }
+
+  .swatch {
+    width: 38px;
+    height: 38px;
+    max-width: 100%;
+    justify-self: center;
+    box-sizing: border-box;
+  }
+
+  .settings-choice-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .settings-choice {
+    min-height: 42px;
+    padding: 8px 6px;
+    border: 2px solid var(--line);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--muted);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.45rem;
+    line-height: 1.35;
+    cursor: pointer;
+    transition: border-color .15s ease, color .15s ease, transform .1s ease, box-shadow .15s ease;
+  }
+
+  .settings-choice:hover,
+  .settings-choice:focus-visible {
+    border-color: var(--cyan);
+    color: var(--text);
+    outline: none;
+    transform: translateY(-1px);
+  }
+
+  .settings-choice.selected {
+    border-color: var(--cyan);
+    color: var(--cyan);
+    box-shadow: 0 0 10px rgba(51,255,240,.22), inset 0 0 12px rgba(51,255,240,.06);
+  }
+
+  body.no-sound .ui-click-sound {
+    display: none !important;
+  }
+
+  body.contrast-dark {
+    --bg: #02040a;
+    --panel: #060a12;
+  }
+
+  body.contrast-soft {
+    --bg: #0c121c;
+    --panel: #111a27;
+  }
+
+  .settings-choice-desc {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: .62rem;
+    line-height: 1.45;
+  }
+
+  body.ui-compact .layout {
+    gap: 24px;
+  }
+
+  body.ui-compact ul.game-list {
+    gap: 12px;
+  }
+
+  body.ui-spacious .layout {
+    gap: 52px;
+  }
+
+  body.ui-spacious ul.game-list {
+    gap: 24px;
+  }
+
+  body.low-glow h1 {
+    text-shadow: 0 0 4px rgba(51,255,240,.45), 0 0 2px #fff;
+  }
+
+  body.low-glow header,
+  body.low-glow .player-frame-wrap,
+  body.low-glow .game-button {
+    box-shadow: 0 4px 0 rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.05);
+  }
+
+  body.high-glow h1 {
+    text-shadow: 0 0 10px rgba(51,255,240,.9), 0 0 28px rgba(51,255,240,.7), 0 0 2px #fff;
+  }
+
+  body.high-glow header {
+    box-shadow:
+      0 0 0 3px rgba(51,255,240,.12),
+      0 0 45px rgba(51,255,240,.24),
+      inset 0 0 40px rgba(255,46,136,.08);
+  }
+
+  body.no-motion *,
+  body.no-motion *::before,
+  body.no-motion *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  @media (max-width: 600px) {
+    .swatch-row {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    .swatch {
+      width: 34px;
+      height: 34px;
+    }
+
+    .settings-choice-row {
+      grid-template-columns: 1fr;
+    }
   }
 
   .swatch {
@@ -1074,14 +1203,26 @@
     <div class="field">
       <label>Accent Color</label>
       <div class="swatch-row" id="swatchRow">
-        <div class="swatch selected" data-color="#33fff0" style="background:#33fff0; color:#33fff0;"></div>
-        <div class="swatch" data-color="#ff2e88" style="background:#ff2e88; color:#ff2e88;"></div>
-        <div class="swatch" data-color="#ffcf4d" style="background:#ffcf4d; color:#ffcf4d;"></div>
-        <div class="swatch" data-color="#7dff5a" style="background:#7dff5a; color:#7dff5a;"></div>
-        <div class="swatch" data-color="#b070ff" style="background:#b070ff; color:#b070ff;"></div>
-        <div class="swatch" data-color="#ff7a3d" style="background:#ff7a3d; color:#ff7a3d;"></div>
-        <div class="swatch" data-color="#ff4d4d" style="background:#ff4d4d; color:#ff4d4d;"></div>
-        <div class="swatch" data-color="#4d8fff" style="background:#4d8fff; color:#4d8fff;"></div>
+        <button type="button" class="swatch selected" data-color="#33fff0" style="background:#33fff0; color:#33fff0;" aria-label="CYAN" title="CYAN"></button>
+        <button type="button" class="swatch" data-color="#ff2e88" style="background:#ff2e88; color:#ff2e88;" aria-label="PINK" title="PINK"></button>
+        <button type="button" class="swatch" data-color="#ffcf4d" style="background:#ffcf4d; color:#ffcf4d;" aria-label="GOLD" title="GOLD"></button>
+        <button type="button" class="swatch" data-color="#7dff5a" style="background:#7dff5a; color:#7dff5a;" aria-label="LIME" title="LIME"></button>
+        <button type="button" class="swatch" data-color="#b070ff" style="background:#b070ff; color:#b070ff;" aria-label="PURPLE" title="PURPLE"></button>
+        <button type="button" class="swatch" data-color="#ff7a3d" style="background:#ff7a3d; color:#ff7a3d;" aria-label="ORANGE" title="ORANGE"></button>
+        <button type="button" class="swatch" data-color="#ff4d4d" style="background:#ff4d4d; color:#ff4d4d;" aria-label="RED" title="RED"></button>
+        <button type="button" class="swatch" data-color="#4d8fff" style="background:#4d8fff; color:#4d8fff;" aria-label="BLUE" title="BLUE"></button>
+        <button type="button" class="swatch" data-color="#00e5ff" style="background:#00e5ff; color:#00e5ff;" aria-label="SKY" title="SKY"></button>
+        <button type="button" class="swatch" data-color="#00ff9d" style="background:#00ff9d; color:#00ff9d;" aria-label="MINT" title="MINT"></button>
+        <button type="button" class="swatch" data-color="#ff4fd8" style="background:#ff4fd8; color:#ff4fd8;" aria-label="MAGENTA" title="MAGENTA"></button>
+        <button type="button" class="swatch" data-color="#a6ff00" style="background:#a6ff00; color:#a6ff00;" aria-label="ACID" title="ACID"></button>
+        <button type="button" class="swatch" data-color="#8c7bff" style="background:#8c7bff; color:#8c7bff;" aria-label="VIOLET" title="VIOLET"></button>
+        <button type="button" class="swatch" data-color="#ff8c42" style="background:#ff8c42; color:#ff8c42;" aria-label="SUNSET" title="SUNSET"></button>
+        <button type="button" class="swatch" data-color="#f7f7ff" style="background:#f7f7ff; color:#f7f7ff;" aria-label="WHITE" title="WHITE"></button>
+        <button type="button" class="swatch" data-color="#7df9ff" style="background:#7df9ff; color:#7df9ff;" aria-label="ICE" title="ICE"></button>
+        <button type="button" class="swatch" data-color="#ff6b9d" style="background:#ff6b9d; color:#ff6b9d;" aria-label="ROSE" title="ROSE"></button>
+        <button type="button" class="swatch" data-color="#c084fc" style="background:#c084fc; color:#c084fc;" aria-label="LAVENDER" title="LAVENDER"></button>
+        <button type="button" class="swatch" data-color="#39ff14" style="background:#39ff14; color:#39ff14;" aria-label="NEON GREEN" title="NEON GREEN"></button>
+        <button type="button" class="swatch" data-color="#ffd166" style="background:#ffd166; color:#ffd166;" aria-label="LEMON" title="LEMON"></button>
       </div>
     </div>
 
@@ -1092,6 +1233,62 @@
           <div class="knob"></div>
         </div>
       </div>
+    </div>
+
+    <div class="field">
+      <label>Neon Glow</label>
+      <div class="settings-choice-row" id="glowChoices">
+        <button type="button" class="settings-choice" data-glow="low">LOW</button>
+        <button type="button" class="settings-choice selected" data-glow="normal">NORMAL</button>
+        <button type="button" class="settings-choice" data-glow="high">HIGH</button>
+      </div>
+      <div class="settings-choice-desc">Control how bright the arcade neon effects look.</div>
+    </div>
+
+    <div class="field">
+      <label>Interface Spacing</label>
+      <div class="settings-choice-row" id="spacingChoices">
+        <button type="button" class="settings-choice" data-spacing="compact">COMPACT</button>
+        <button type="button" class="settings-choice selected" data-spacing="normal">NORMAL</button>
+        <button type="button" class="settings-choice" data-spacing="spacious">SPACIOUS</button>
+      </div>
+      <div class="settings-choice-desc">Change the amount of space between the arcade sections.</div>
+    </div>
+
+    <div class="field">
+      <label>Arcade Motion</label>
+      <div class="toggle-row">
+        <div>
+          <div style="font-size:.72rem; font-weight:700; color:var(--text);">Animations</div>
+          <div style="font-size:.62rem; color:var(--muted); margin-top:4px;">Flicker, glow pulses, and button motion.</div>
+        </div>
+        <div class="toggle-switch on" id="motionToggle" role="switch" aria-checked="true" tabindex="0">
+          <div class="knob"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Arcade Sound</label>
+      <div class="toggle-row">
+        <div>
+          <div style="font-size:.72rem; font-weight:700; color:var(--text);">UI Sound Effects</div>
+          <div style="font-size:.62rem; color:var(--muted); margin-top:4px;">Click and interface sounds.</div>
+        </div>
+        <div class="toggle-switch on" id="soundToggle" role="switch" aria-checked="true" tabindex="0">
+          <div class="knob"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Background Contrast</label>
+      <div class="settings-choice-row" id="contrastChoices">
+        <button type="button" class="settings-choice selected" data-contrast="normal">NORMAL</button>
+        <button type="button" class="settings-choice" data-contrast="dark">DARK</button>
+        <button type="button" class="settings-choice" data-contrast="soft">SOFT</button>
+      </div>
+      <div class="settings-choice-desc">Change how deep or soft the arcade background feels.</div>
     </div>
 
     <div class="panel-buttons">
@@ -1160,6 +1357,11 @@
   const playerNameInput = document.getElementById('playerNameInput');
   const swatchRow = document.getElementById('swatchRow');
   const scanlineToggle = document.getElementById('scanlineToggle');
+  const glowChoices = document.getElementById('glowChoices');
+  const spacingChoices = document.getElementById('spacingChoices');
+  const motionToggle = document.getElementById('motionToggle');
+  const soundToggle = document.getElementById('soundToggle');
+  const contrastChoices = document.getElementById('contrastChoices');
   const loggedOutView = document.getElementById('loggedOutView');
   const loggedInView = document.getElementById('loggedInView');
   const loggedInEmail = document.getElementById('loggedInEmail');
@@ -1175,6 +1377,71 @@
   const gateMessage = document.getElementById('authGateMessage');
   const gateLoginBtn = document.getElementById('gateLoginBtn');
   const gateSignupBtn = document.getElementById('gateSignupBtn');
+
+  const EXTRA_SETTINGS_KEY = 'arcade_extra_settings_v1';
+  const DEFAULT_EXTRA_SETTINGS = {
+    glow: 'normal',
+    spacing: 'normal',
+    motion: true,
+    sound: true,
+    contrast: 'normal'
+  };
+
+  function readExtraSettings() {
+    try {
+      const raw = localStorage.getItem(EXTRA_SETTINGS_KEY);
+      const parsed = raw ? JSON.parse(raw) : {};
+      return {
+        glow: ['low', 'normal', 'high'].includes(parsed.glow) ? parsed.glow : DEFAULT_EXTRA_SETTINGS.glow,
+        spacing: ['compact', 'normal', 'spacious'].includes(parsed.spacing) ? parsed.spacing : DEFAULT_EXTRA_SETTINGS.spacing,
+        motion: typeof parsed.motion === 'boolean' ? parsed.motion : DEFAULT_EXTRA_SETTINGS.motion,
+        sound: typeof parsed.sound === 'boolean' ? parsed.sound : DEFAULT_EXTRA_SETTINGS.sound,
+        contrast: ['normal', 'dark', 'soft'].includes(parsed.contrast) ? parsed.contrast : DEFAULT_EXTRA_SETTINGS.contrast
+      };
+    } catch (_) {
+      return { ...DEFAULT_EXTRA_SETTINGS };
+    }
+  }
+
+  function writeExtraSettings(settings) {
+    try {
+      localStorage.setItem(EXTRA_SETTINGS_KEY, JSON.stringify(settings));
+    } catch (_) {}
+  }
+
+  function applyExtraSettings(settings) {
+    const safe = {
+      ...DEFAULT_EXTRA_SETTINGS,
+      ...(settings || {})
+    };
+
+    document.body.classList.toggle('low-glow', safe.glow === 'low');
+    document.body.classList.toggle('high-glow', safe.glow === 'high');
+    document.body.classList.toggle('ui-compact', safe.spacing === 'compact');
+    document.body.classList.toggle('ui-spacious', safe.spacing === 'spacious');
+    document.body.classList.toggle('no-motion', !safe.motion);
+    document.body.classList.toggle('no-sound', !safe.sound);
+    document.body.classList.toggle('contrast-dark', safe.contrast === 'dark');
+    document.body.classList.toggle('contrast-soft', safe.contrast === 'soft');
+
+    glowChoices.querySelectorAll('.settings-choice').forEach(btn => {
+      btn.classList.toggle('selected', btn.dataset.glow === safe.glow);
+    });
+    spacingChoices.querySelectorAll('.settings-choice').forEach(btn => {
+      btn.classList.toggle('selected', btn.dataset.spacing === safe.spacing);
+    });
+    motionToggle.classList.toggle('on', safe.motion);
+    motionToggle.setAttribute('aria-checked', String(safe.motion));
+    soundToggle.classList.toggle('on', safe.sound);
+    soundToggle.setAttribute('aria-checked', String(safe.sound));
+
+    contrastChoices.querySelectorAll('.settings-choice').forEach(btn => {
+      btn.classList.toggle('selected', btn.dataset.contrast === safe.contrast);
+    });
+  }
+
+  let extraSettings = readExtraSettings();
+  applyExtraSettings(extraSettings);
 
   function cloneDefaults() {
     return { ...DEFAULT_SETTINGS };
@@ -1575,7 +1842,10 @@
 
   function openSettings() {
     playerNameInput.value = window.arcadeSettings.displayName;
+    applySettingsToUI();
+    applyExtraSettings(extraSettings);
     updateCreditsDisplay();
+    applyExtraSettings(extraSettings);
     settingsOverlay.classList.add('open');
   }
 
@@ -1603,6 +1873,58 @@
       document.documentElement.style.setProperty('--cyan', color);
       saveProfile({ accent: color });
     });
+  });
+
+  glowChoices.querySelectorAll('.settings-choice').forEach(btn => {
+    btn.addEventListener('click', () => {
+      extraSettings.glow = btn.dataset.glow;
+      applyExtraSettings(extraSettings);
+      writeExtraSettings(extraSettings);
+    });
+  });
+
+  spacingChoices.querySelectorAll('.settings-choice').forEach(btn => {
+    btn.addEventListener('click', () => {
+      extraSettings.spacing = btn.dataset.spacing;
+      applyExtraSettings(extraSettings);
+      writeExtraSettings(extraSettings);
+    });
+  });
+
+  function toggleMotion() {
+    extraSettings.motion = !extraSettings.motion;
+    applyExtraSettings(extraSettings);
+    writeExtraSettings(extraSettings);
+  }
+
+  function toggleSound() {
+    extraSettings.sound = !extraSettings.sound;
+    applyExtraSettings(extraSettings);
+    writeExtraSettings(extraSettings);
+  }
+
+  soundToggle.addEventListener('click', toggleSound);
+  soundToggle.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      toggleSound();
+    }
+  });
+
+  contrastChoices.querySelectorAll('.settings-choice').forEach(btn => {
+    btn.addEventListener('click', () => {
+      extraSettings.contrast = btn.dataset.contrast;
+      applyExtraSettings(extraSettings);
+      writeExtraSettings(extraSettings);
+    });
+  });
+
+  motionToggle.addEventListener('click', toggleMotion);
+  motionToggle.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      toggleMotion();
+    }
   });
 
   scanlineToggle.addEventListener('click', () => {

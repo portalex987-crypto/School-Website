@@ -786,6 +786,25 @@
   <div id="settingsPanel">
     <h2>OPTIONS</h2>
 
+    <div class="field" id="accountSection">
+      <label>Account</label>
+      <div id="loggedOutView">
+        <input type="text" id="authEmail" placeholder="Email" style="margin-bottom:8px;">
+        <input type="password" id="authPassword" placeholder="Password" style="margin-bottom:8px;">
+        <div style="display:flex; gap:8px;">
+          <button type="button" id="loginBtn" style="flex:1; padding:10px; border-radius:6px; border:2px solid var(--line); background:var(--cyan); color:#04211f; font-weight:700; cursor:pointer;">Log In</button>
+          <button type="button" id="signupBtn" style="flex:1; padding:10px; border-radius:6px; border:2px solid var(--line); background:var(--panel-hover); color:var(--text); font-weight:700; cursor:pointer;">Sign Up</button>
+        </div>
+        <div id="authMessage" style="font-size:0.75rem; color:var(--muted); margin-top:8px; text-align:center;"></div>
+      </div>
+      <div id="loggedInView" style="display:none;">
+        <div style="font-size:0.85rem; color:var(--text); margin-bottom:8px;">
+          Logged in as <strong id="loggedInEmail"></strong>
+        </div>
+        <button type="button" id="logoutBtn" style="width:100%; padding:10px; border-radius:6px; border:2px solid var(--line); background:var(--panel-hover); color:var(--text); font-weight:700; cursor:pointer;">Log Out</button>
+      </div>
+    </div>
+
     <div class="field">
       <label>Credits Remaining</label>
       <div style="font-family:'Press Start 2P', monospace; font-size:1.4rem; color:var(--gold); text-shadow:0 0 8px rgba(255,207,77,0.6); text-align:center; padding:8px 0;">
@@ -844,10 +863,22 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // ============== SETTINGS PANEL ==============
-  // Everything here lives in memory only (resets on page reload) --
-  // no data is sent anywhere or stored between visits.
+  // ============== SETTINGS PANEL + ACCOUNTS ==============
+  // PASTE YOUR OWN SUPABASE PROJECT URL AND ANON KEY BELOW --
+  // same values used in game-10.html.
+  const SUPABASE_URL = "YOUR_SUPABASE_URL";
+  const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+  const authIsConfigured = SUPABASE_URL !== "YOUR_SUPABASE_URL";
+  const supabaseClient = authIsConfigured
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    : null;
+
+  let currentUser = null;
+
+  // Guest defaults, used until (or unless) someone logs in.
+  // Guest progress lives in memory only and resets on reload.
   window.arcadeSettings = {
     displayName: 'You',
     accent: '#33fff0',
@@ -862,6 +893,147 @@
   const playerNameInput = document.getElementById('playerNameInput');
   const swatchRow = document.getElementById('swatchRow');
   const scanlineToggle = document.getElementById('scanlineToggle');
+  const loggedOutView = document.getElementById('loggedOutView');
+  const loggedInView = document.getElementById('loggedInView');
+  const loggedInEmail = document.getElementById('loggedInEmail');
+  const authEmail = document.getElementById('authEmail');
+  const authPassword = document.getElementById('authPassword');
+  const authMessage = document.getElementById('authMessage');
+  const loginBtn = document.getElementById('loginBtn');
+  const signupBtn = document.getElementById('signupBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  function applySettingsToUI() {
+    swatchRow.querySelectorAll('.swatch').forEach(s => {
+      s.classList.toggle('selected', s.dataset.color === window.arcadeSettings.accent);
+    });
+    document.documentElement.style.setProperty('--cyan', window.arcadeSettings.accent);
+    scanlineToggle.classList.toggle('on', window.arcadeSettings.scanlines);
+    document.body.classList.toggle('no-scanlines', !window.arcadeSettings.scanlines);
+    updateCreditsDisplay();
+  }
+
+  async function loadProfile(user) {
+    const { data, error } = await supabaseClient
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (error) {
+      authMessage.textContent = 'Could not load your profile: ' + error.message;
+      return;
+    }
+
+    if (!data) {
+      // First time this user has logged in -- create their profile row.
+      const defaults = {
+        id: user.id,
+        display_name: 'You',
+        accent: '#33fff0',
+        scanlines: true,
+        credits: 20
+      };
+      await supabaseClient.from('profiles').insert(defaults);
+      window.arcadeSettings = {
+        displayName: defaults.display_name,
+        accent: defaults.accent,
+        scanlines: defaults.scanlines,
+        credits: defaults.credits
+      };
+    } else {
+      window.arcadeSettings = {
+        displayName: data.display_name,
+        accent: data.accent,
+        scanlines: data.scanlines,
+        credits: data.credits
+      };
+    }
+
+    applySettingsToUI();
+  }
+
+  async function saveProfile(patch) {
+    if (!currentUser || !authIsConfigured) return;
+    await supabaseClient.from('profiles').update(patch).eq('id', currentUser.id);
+  }
+
+  // Exposed so the game-click handler (below, in the other script)
+  // can persist a credit spend when someone is logged in.
+  window.persistCredits = function (newCredits) {
+    if (currentUser) saveProfile({ credits: newCredits });
+  };
+
+  function showLoggedIn(user) {
+    currentUser = user;
+    loggedOutView.style.display = 'none';
+    loggedInView.style.display = 'block';
+    loggedInEmail.textContent = user.email;
+  }
+
+  function showLoggedOut() {
+    currentUser = null;
+    loggedOutView.style.display = 'block';
+    loggedInView.style.display = 'none';
+    window.arcadeSettings = {
+      displayName: 'You',
+      accent: '#33fff0',
+      scanlines: true,
+      credits: 20
+    };
+    applySettingsToUI();
+  }
+
+  if (authIsConfigured) {
+    signupBtn.addEventListener('click', async () => {
+      const email = authEmail.value.trim();
+      const password = authPassword.value;
+      if (!email || !password) {
+        authMessage.textContent = 'Enter an email and password.';
+        return;
+      }
+      const { data, error } = await supabaseClient.auth.signUp({ email, password });
+      if (error) {
+        authMessage.textContent = error.message;
+      } else if (data.user && !data.session) {
+        authMessage.textContent = 'Check your email to confirm your account, then log in.';
+      } else if (data.session) {
+        await loadProfile(data.user);
+        showLoggedIn(data.user);
+      }
+    });
+
+    loginBtn.addEventListener('click', async () => {
+      const email = authEmail.value.trim();
+      const password = authPassword.value;
+      if (!email || !password) {
+        authMessage.textContent = 'Enter an email and password.';
+        return;
+      }
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) {
+        authMessage.textContent = error.message;
+      } else {
+        await loadProfile(data.user);
+        showLoggedIn(data.user);
+      }
+    });
+
+    logoutBtn.addEventListener('click', async () => {
+      await supabaseClient.auth.signOut();
+      showLoggedOut();
+    });
+
+    // If someone's already logged in from a previous visit, restore them.
+    supabaseClient.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        loadProfile(data.session.user).then(() => showLoggedIn(data.session.user));
+      }
+    });
+  } else {
+    document.getElementById('accountSection').innerHTML =
+      '<label>Account</label><div style="font-size:0.8rem; color:var(--muted);">Accounts aren\'t set up yet.</div>';
+  }
 
   function openSettings() {
     playerNameInput.value = window.arcadeSettings.displayName;
@@ -891,6 +1063,7 @@
       const color = sw.dataset.color;
       window.arcadeSettings.accent = color;
       document.documentElement.style.setProperty('--cyan', color);
+      saveProfile({ accent: color });
     });
   });
 
@@ -898,10 +1071,13 @@
     const isOn = scanlineToggle.classList.toggle('on');
     window.arcadeSettings.scanlines = isOn;
     document.body.classList.toggle('no-scanlines', !isOn);
+    saveProfile({ scanlines: isOn });
   });
 
   saveSettingsBtn.addEventListener('click', () => {
-    window.arcadeSettings.displayName = playerNameInput.value.trim() || 'You';
+    const name = playerNameInput.value.trim() || 'You';
+    window.arcadeSettings.displayName = name;
+    saveProfile({ display_name: name });
     closeSettings();
   });
 </script>
@@ -923,7 +1099,7 @@
     "Super Liquid Soccer", // 07
     "Learn To Fly 2", // 08
     "MineCraft!", // 09
-    "Tic-Tac-Toe Arena", // 10
+    "Chat", // 10
     "COMING SOON!", // 11
     "COMING SOON!", // 12
     "COMING SOON!", // 13
@@ -1064,6 +1240,7 @@
       }
 
       window.arcadeSettings.credits -= 1;
+      if (window.persistCredits) window.persistCredits(window.arcadeSettings.credits);
       updateCreditsDisplay();
 
       buttons.forEach(b => b.classList.remove('active'));
@@ -1105,9 +1282,13 @@
   const AI_ENDPOINT = "https://gabe-ai-backend.portalex987.workers.dev/api/chat";
 
   const SYSTEM_PROMPT =
-    "You are Gabe, a friendly, funny, upbeat chat companion living on a " +
-    "retro game hub website. Keep replies short and casual, like texting " +
-    "a buddy. Never claim to be a real person.";
+    "You are Gabe, a helpful personal assistant. Your sole goal is to " +
+    "help the person with whatever they need -- answering questions, " +
+    "explaining things clearly, helping them plan or organize, writing " +
+    "or editing text, and any other assistance they ask for. Be clear, " +
+    "accurate, and genuinely useful rather than just casual or " +
+    "entertaining. Never claim to be a real person or to have feelings, " +
+    "a body, or a life outside this conversation.";
 
   const log = document.querySelector('#aiGame #log');
   const form = document.querySelector('#aiGame #chatForm');

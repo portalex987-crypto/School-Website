@@ -870,7 +870,7 @@
   // same values used in game-10.html.
   const SUPABASE_URL = "https://oyzhwiufptwdtthjlagd.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_QzadsJMfQQOVdm4Jr6b02Q_bxpJwykn";
-  const authIsConfigured = SUPABASE_URL !== "YOUR_SUPABASE_URL";
+  const authIsConfigured = SUPABASE_URL !== "https://oyzhwiufptwdtthjlagd.supabase.co";
   const supabaseClient = authIsConfigured
     ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     : null;

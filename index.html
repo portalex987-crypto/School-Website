@@ -35,7 +35,7 @@
     font-family: 'Rubik', sans-serif;
     display: flex;
     justify-content: center;
-    padding: 48px 24px 90px;
+    padding: 110px 24px 90px;
     overflow-x: hidden;
   }
 
@@ -172,11 +172,7 @@
     background:
       linear-gradient(155deg, var(--panel-hover) 0%, var(--panel) 60%);
     border: 2px solid var(--line);
-    border-radius: 10px;
-    clip-path: polygon(
-      12px 0, 100% 0, 100% calc(100% - 12px),
-      calc(100% - 12px) 100%, 0 100%, 0 12px
-    );
+    border-radius: 12px;
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -230,12 +226,28 @@
   }
 
   .game-button.active {
-    border-color: var(--pink);
+    border-color: #39ff6a;
     color: var(--text);
     box-shadow:
       0 6px 0 rgba(0,0,0,0.45),
-      0 0 20px rgba(255,46,136,0.5),
+      0 0 20px rgba(57,255,106,0.6),
       inset 0 1px 0 rgba(255,255,255,0.08);
+    animation: activePulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes activePulse {
+    0%, 100% {
+      box-shadow:
+        0 6px 0 rgba(0,0,0,0.45),
+        0 0 16px rgba(57,255,106,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    50% {
+      box-shadow:
+        0 6px 0 rgba(0,0,0,0.45),
+        0 0 30px rgba(57,255,106,0.85),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+    }
   }
 
   .slot-icon {
@@ -327,6 +339,248 @@
     z-index: 1;
   }
 
+  /* ============== SETTINGS BUTTON + PANEL ============== */
+
+  #settingsBtn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: linear-gradient(155deg, var(--panel-hover) 0%, var(--panel) 60%);
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    color: var(--gold);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    box-shadow:
+      0 3px 0 rgba(0,0,0,0.45),
+      0 0 12px rgba(255,207,77,0.25),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+    transition: border-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  }
+
+  #settingsBtn:hover,
+  #settingsBtn:focus-visible {
+    border-color: var(--cyan);
+    outline: none;
+    transform: translateY(-2px);
+    box-shadow:
+      0 5px 0 rgba(0,0,0,0.45),
+      0 0 14px rgba(51,255,240,0.4),
+      inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+
+  #settingsBtn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.45);
+  }
+
+  #settingsBtn .gear-icon {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.8;
+  }
+
+  #settingsOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5,4,10,0.75);
+    backdrop-filter: blur(2px);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  #settingsOverlay.open {
+    display: flex;
+  }
+
+  #settingsPanel {
+    width: 100%;
+    max-width: 380px;
+    background: linear-gradient(180deg, var(--panel) 0%, #100c1c 100%);
+    border: 3px solid var(--line);
+    border-radius: 16px;
+    box-shadow:
+      0 0 0 3px rgba(51,255,240,0.10),
+      0 0 40px rgba(51,255,240,0.15),
+      inset 0 0 30px rgba(255,46,136,0.05);
+    padding: 26px 22px 26px;
+    position: relative;
+  }
+
+  #settingsPanel::before,
+  #settingsPanel::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 8px var(--gold);
+  }
+
+  #settingsPanel::before { left: 16px; }
+  #settingsPanel::after { right: 16px; }
+
+  #settingsPanel h2 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.85rem;
+    color: var(--cyan);
+    text-shadow: 0 0 8px rgba(51,255,240,0.6);
+    margin: 0 0 20px;
+    text-align: center;
+    letter-spacing: 0.03em;
+  }
+
+  #settingsPanel .field {
+    margin-bottom: 20px;
+  }
+
+  #settingsPanel label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  #settingsPanel input[type="text"] {
+    width: 100%;
+    background: var(--bg);
+    border: 2px solid var(--line);
+    border-radius: 6px;
+    color: var(--text);
+    padding: 10px 12px;
+    font-family: 'Rubik', sans-serif;
+    font-size: 0.9rem;
+  }
+
+  #settingsPanel input[type="text"]:focus {
+    outline: none;
+    border-color: var(--cyan);
+  }
+
+  .swatch-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .swatch {
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    border: 3px solid var(--line);
+    cursor: pointer;
+    transition: border-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  }
+
+  .swatch:hover {
+    transform: scale(1.12) rotate(-2deg);
+  }
+
+  .swatch.selected {
+    border-color: #fff;
+    box-shadow: 0 0 12px currentColor, 0 0 2px #fff inset;
+    transform: scale(1.08);
+  }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .toggle-switch {
+    position: relative;
+    width: 46px;
+    height: 24px;
+    background: var(--bg);
+    border: 2px solid var(--line);
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  .toggle-switch .knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: left 0.15s ease, background 0.15s ease;
+  }
+
+  .toggle-switch.on {
+    border-color: var(--cyan);
+  }
+
+  .toggle-switch.on .knob {
+    left: 24px;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+  }
+
+  #settingsPanel .panel-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  #settingsPanel .panel-buttons button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px solid var(--line);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.15s ease;
+  }
+
+  #settingsPanel .panel-buttons button:active {
+    transform: translateY(1px);
+  }
+
+  #saveSettingsBtn {
+    background: var(--cyan);
+    color: #04211f;
+    border-color: var(--cyan) !important;
+  }
+
+  #saveSettingsBtn:hover {
+    box-shadow: 0 0 14px rgba(51,255,240,0.5);
+  }
+
+  #closeSettingsBtn {
+    background: var(--panel-hover);
+    color: var(--text);
+  }
+
+  #closeSettingsBtn:hover {
+    border-color: var(--pink) !important;
+  }
+
+  body.no-scanlines::after {
+    display: none;
+  }
+
   @media (max-width: 900px) {
     ul.game-list {
       grid-template-columns: repeat(4, 1fr);
@@ -386,8 +640,14 @@
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: var(--pink);
-    box-shadow: 0 0 8px var(--pink);
+    background: #39ff6a;
+    box-shadow: 0 0 8px #39ff6a;
+    animation: dotPulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes dotPulse {
+    0%, 100% { box-shadow: 0 0 6px #39ff6a; }
+    50% { box-shadow: 0 0 14px #39ff6a; }
   }
 
   #aiGame header h1 {
@@ -514,10 +774,64 @@
 </head>
 <body>
 
+<button id="settingsBtn" type="button">
+  <svg class="gear-icon" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+  </svg>
+  SETTINGS
+</button>
+
+<div id="settingsOverlay">
+  <div id="settingsPanel">
+    <h2>OPTIONS</h2>
+
+    <div class="field">
+      <label>Credits Remaining</label>
+      <div style="font-family:'Press Start 2P', monospace; font-size:1.4rem; color:var(--gold); text-shadow:0 0 8px rgba(255,207,77,0.6); text-align:center; padding:8px 0;">
+        <span id="creditsDisplay">20</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="playerNameInput">Player Name</label>
+      <input type="text" id="playerNameInput" placeholder="You" maxlength="16">
+    </div>
+
+    <div class="field">
+      <label>Accent Color</label>
+      <div class="swatch-row" id="swatchRow">
+        <div class="swatch selected" data-color="#33fff0" style="background:#33fff0; color:#33fff0;"></div>
+        <div class="swatch" data-color="#ff2e88" style="background:#ff2e88; color:#ff2e88;"></div>
+        <div class="swatch" data-color="#ffcf4d" style="background:#ffcf4d; color:#ffcf4d;"></div>
+        <div class="swatch" data-color="#7dff5a" style="background:#7dff5a; color:#7dff5a;"></div>
+        <div class="swatch" data-color="#b070ff" style="background:#b070ff; color:#b070ff;"></div>
+        <div class="swatch" data-color="#ff7a3d" style="background:#ff7a3d; color:#ff7a3d;"></div>
+        <div class="swatch" data-color="#ff4d4d" style="background:#ff4d4d; color:#ff4d4d;"></div>
+        <div class="swatch" data-color="#4d8fff" style="background:#4d8fff; color:#4d8fff;"></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="toggle-row">
+        <label style="margin-bottom:0;">CRT Scanlines</label>
+        <div class="toggle-switch on" id="scanlineToggle">
+          <div class="knob"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-buttons">
+      <button type="button" id="closeSettingsBtn">Cancel</button>
+      <button type="button" id="saveSettingsBtn">Save</button>
+    </div>
+  </div>
+</div>
+
 <div class="layout">
   <header>
     <h1>ARCADE GAMES</h1>
-    <p class="subtitle">Insert Coin — 50 Cartridges Loaded</p>
+    <p class="subtitle">Have Fun, More Games Out Soon</p>
   </header>
 
   <ul class="game-list" id="gameList"></ul>
@@ -529,6 +843,68 @@
     </div>
   </div>
 </div>
+
+<script>
+  // ============== SETTINGS PANEL ==============
+  // Everything here lives in memory only (resets on page reload) --
+  // no data is sent anywhere or stored between visits.
+  window.arcadeSettings = {
+    displayName: 'You',
+    accent: '#33fff0',
+    scanlines: true,
+    credits: 20
+  };
+
+  const settingsBtn = document.getElementById('settingsBtn');
+  const settingsOverlay = document.getElementById('settingsOverlay');
+  const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+  const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+  const playerNameInput = document.getElementById('playerNameInput');
+  const swatchRow = document.getElementById('swatchRow');
+  const scanlineToggle = document.getElementById('scanlineToggle');
+
+  function openSettings() {
+    playerNameInput.value = window.arcadeSettings.displayName;
+    updateCreditsDisplay();
+    settingsOverlay.classList.add('open');
+  }
+
+  function updateCreditsDisplay() {
+    const el = document.getElementById('creditsDisplay');
+    if (el) el.textContent = window.arcadeSettings.credits;
+  }
+
+  function closeSettings() {
+    settingsOverlay.classList.remove('open');
+  }
+
+  settingsBtn.addEventListener('click', openSettings);
+  closeSettingsBtn.addEventListener('click', closeSettings);
+  settingsOverlay.addEventListener('click', (e) => {
+    if (e.target === settingsOverlay) closeSettings();
+  });
+
+  swatchRow.querySelectorAll('.swatch').forEach(sw => {
+    sw.addEventListener('click', () => {
+      swatchRow.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
+      sw.classList.add('selected');
+      const color = sw.dataset.color;
+      window.arcadeSettings.accent = color;
+      document.documentElement.style.setProperty('--cyan', color);
+    });
+  });
+
+  scanlineToggle.addEventListener('click', () => {
+    const isOn = scanlineToggle.classList.toggle('on');
+    window.arcadeSettings.scanlines = isOn;
+    document.body.classList.toggle('no-scanlines', !isOn);
+  });
+
+  saveSettingsBtn.addEventListener('click', () => {
+    window.arcadeSettings.displayName = playerNameInput.value.trim() || 'You';
+    closeSettings();
+  });
+</script>
 
 <script>
   const TOTAL_GAMES = 50;
@@ -547,7 +923,7 @@
     "Super Liquid Soccer", // 07
     "Learn To Fly 2", // 08
     "MineCraft!", // 09
-    "COMING SOON!", // 10
+    "Tic-Tac-Toe Arena", // 10
     "COMING SOON!", // 11
     "COMING SOON!", // 12
     "COMING SOON!", // 13
@@ -673,6 +1049,23 @@
 
   buttons.forEach(btn => {
     btn.addEventListener('click', () => {
+      // Don't re-charge a credit for reopening the game that's already loaded.
+      if (btn.classList.contains('active')) return;
+
+      if (window.arcadeSettings.credits <= 0) {
+        buttons.forEach(b => b.classList.remove('active'));
+        wrap.innerHTML = `
+          <p class="placeholder">
+            OUT OF CREDITS<br><br>
+            Open Settings (top right) to check your balance.
+          </p>
+        `;
+        return;
+      }
+
+      window.arcadeSettings.credits -= 1;
+      updateCreditsDisplay();
+
       buttons.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 

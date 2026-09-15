@@ -543,7 +543,7 @@
   const sendBtn = document.getElementById('sendBtn');
   const statusLabel = document.getElementById('statusLabel');
 
-  const isConfigured = OPENAI_API_KEY !== "YOUR_API_KEY_HERE";
+  const isConfigured = OPENAI_API_KEY !== "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";
   let history = [{ role: 'system', content: SYSTEM_PROMPT }];
 
   function addMessage(text, sender, isTyping) {
@@ -565,7 +565,7 @@
       <div class="setup-warning">
         Gabe isn't connected yet.<br><br>
         Open <code>game-03.html</code> and replace
-        <code>YOUR_API_KEY_HERE</code> with your own OpenAI API key,
+        <code>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</code> with your own OpenAI API key,
         then reload this page.
       </div>
     \`;
@@ -631,7 +631,7 @@
   // ======================================================
   // Keep your OpenAI API key on a server, never in this GitHub Pages file.
   // Your backend should expose POST /api/chat and call OpenAI securely.
-  const AI_ENDPOINT = "/api/chat";
+  const AI_ENDPOINT = "https://gabe-ai-backend.portalex987.workers.dev/api/chat";
 
   // Cheaper, faster model -- good for a casual chat companion.
   const MODEL = "gpt-4o-mini";

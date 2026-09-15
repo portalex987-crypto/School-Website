@@ -581,6 +581,107 @@
     display: none;
   }
 
+  /* ============== REQUIRED LOGIN GATE ============== */
+
+  body.gated .layout,
+  body.gated #settingsBtn {
+    display: none;
+  }
+
+  #authGate {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background:
+      radial-gradient(circle at 15% 0%, rgba(51,255,240,0.10), transparent 45%),
+      radial-gradient(circle at 85% 15%, rgba(255,46,136,0.10), transparent 45%),
+      var(--bg);
+  }
+
+  body.gated #authGate {
+    display: flex;
+  }
+
+  #authGatePanel {
+    width: 100%;
+    max-width: 360px;
+    background: linear-gradient(180deg, var(--panel) 0%, #100c1c 100%);
+    border: 3px solid var(--line);
+    border-radius: 16px;
+    box-shadow:
+      0 0 0 3px rgba(51,255,240,0.10),
+      0 0 40px rgba(51,255,240,0.15);
+    padding: 28px 24px;
+    text-align: center;
+  }
+
+  #authGatePanel h1 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1.1rem;
+    color: var(--cyan);
+    text-shadow: 0 0 8px rgba(51,255,240,0.6);
+    margin: 0 0 8px;
+  }
+
+  #authGatePanel p {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin: 0 0 20px;
+  }
+
+  #authGatePanel input {
+    width: 100%;
+    background: var(--bg);
+    border: 2px solid var(--line);
+    border-radius: 8px;
+    color: var(--text);
+    padding: 12px;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+  }
+
+  #authGatePanel input:focus {
+    outline: none;
+    border-color: var(--cyan);
+  }
+
+  #authGatePanel .gate-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  #authGatePanel .gate-buttons button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px solid var(--line);
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Rubik', sans-serif;
+  }
+
+  #gateLoginBtn {
+    background: var(--cyan);
+    color: #04211f;
+  }
+
+  #gateSignupBtn {
+    background: var(--panel-hover);
+    color: var(--text);
+  }
+
+  #authGateMessage {
+    margin-top: 14px;
+    font-size: 0.8rem;
+    color: var(--pink);
+    min-height: 1em;
+  }
+
   @media (max-width: 900px) {
     ul.game-list {
       grid-template-columns: repeat(4, 1fr);
@@ -772,7 +873,22 @@
   }
 </style>
 </head>
-<body>
+<body class="gated">
+
+<div id="authGate">
+  <div id="authGatePanel">
+    <h1>ARCADE GAMES</h1>
+    <p>Sign in or create an account to play.</p>
+    <input type="text" id="gateEmail" placeholder="Email">
+    <input type="password" id="gatePassword" placeholder="Password">
+    <div class="gate-buttons">
+      <button type="button" id="gateLoginBtn">Log In</button>
+      <button type="button" id="gateSignupBtn">Sign Up</button>
+    </div>
+    <div id="authGateMessage"></div>
+  </div>
+</div>
+
 
 <button id="settingsBtn" type="button">
   <svg class="gear-icon" viewBox="0 0 24 24">
@@ -870,7 +986,7 @@
   // same values used in game-10.html.
   const SUPABASE_URL = "https://oyzhwiufptwdtthjlagd.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_QzadsJMfQQOVdm4Jr6b02Q_bxpJwykn";
-  const authIsConfigured = SUPABASE_URL !== "https://oyzhwiufptwdtthjlagd.supabase.co";
+  const authIsConfigured = SUPABASE_URL !== "YOUR_SUPABASE_URL";
   const supabaseClient = authIsConfigured
     ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     : null;
@@ -969,6 +1085,7 @@
     loggedOutView.style.display = 'none';
     loggedInView.style.display = 'block';
     loggedInEmail.textContent = user.email;
+    document.body.classList.remove('gated');
   }
 
   function showLoggedOut() {
@@ -982,6 +1099,7 @@
       credits: 20
     };
     applySettingsToUI();
+    document.body.classList.add('gated');
   }
 
   if (authIsConfigured) {
@@ -1030,9 +1148,54 @@
         loadProfile(data.session.user).then(() => showLoggedIn(data.session.user));
       }
     });
+
+    // ---- Login gate (blocks the whole site until signed in) ----
+    const gateEmail = document.getElementById('gateEmail');
+    const gatePassword = document.getElementById('gatePassword');
+    const gateMessage = document.getElementById('authGateMessage');
+    const gateLoginBtn = document.getElementById('gateLoginBtn');
+    const gateSignupBtn = document.getElementById('gateSignupBtn');
+
+    gateLoginBtn.addEventListener('click', async () => {
+      const email = gateEmail.value.trim();
+      const password = gatePassword.value;
+      if (!email || !password) {
+        gateMessage.textContent = 'Enter an email and password.';
+        return;
+      }
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) {
+        gateMessage.textContent = error.message;
+      } else {
+        gateMessage.textContent = '';
+        await loadProfile(data.user);
+        showLoggedIn(data.user);
+      }
+    });
+
+    gateSignupBtn.addEventListener('click', async () => {
+      const email = gateEmail.value.trim();
+      const password = gatePassword.value;
+      if (!email || !password) {
+        gateMessage.textContent = 'Enter an email and password.';
+        return;
+      }
+      const { data, error } = await supabaseClient.auth.signUp({ email, password });
+      if (error) {
+        gateMessage.textContent = error.message;
+      } else if (data.user && !data.session) {
+        gateMessage.textContent = 'Check your email to confirm your account, then log in.';
+      } else if (data.session) {
+        gateMessage.textContent = '';
+        await loadProfile(data.user);
+        showLoggedIn(data.user);
+      }
+    });
   } else {
     document.getElementById('accountSection').innerHTML =
       '<label>Account</label><div style="font-size:0.8rem; color:var(--muted);">Accounts aren\'t set up yet.</div>';
+    // Accounts aren't configured yet -- don't lock people out of the site.
+    document.body.classList.remove('gated');
   }
 
   function openSettings() {

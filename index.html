@@ -716,12 +716,12 @@
 
   * { box-sizing: border-box; }
 
-  #aiGame html, body {
+  #aiGame {
     height: 100%;
     margin: 0;
   }
 
-  #aiGame body {
+  #aiGame {
     background: var(--bg);
     color: var(--text);
     font-family: 'Rubik', sans-serif;
@@ -879,7 +879,7 @@
   <div id="authGatePanel">
     <h1>ARCADE GAMES</h1>
     <p>Sign in or create an account to play.</p>
-    <input type="text" id="gateEmail" placeholder="Email">
+    <input type="email" id="gateEmail" placeholder="Email">
     <input type="password" id="gatePassword" placeholder="Password">
     <div class="gate-buttons">
       <button type="button" id="gateLoginBtn">Log In</button>
@@ -982,25 +982,31 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   // ============== SETTINGS PANEL + ACCOUNTS ==============
-  // PASTE YOUR OWN SUPABASE PROJECT URL AND ANON KEY BELOW --
-  // same values used in game-10.html.
+  // Supabase is optional at runtime: if the SDK/project is unavailable,
+  // the arcade stays usable in guest mode instead of getting stuck.
   const SUPABASE_URL = "https://oyzhwiufptwdtthjlagd.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_QzadsJMfQQOVdm4Jr6b02Q_bxpJwykn";
-  const authIsConfigured = SUPABASE_URL !== "https://oyzhwiufptwdtthjlagd.supabase.co";
-  const supabaseClient = authIsConfigured
+  const supabaseSdkAvailable = !!(
+    window.supabase && typeof window.supabase.createClient === 'function'
+  );
+  const authIsConfigured = SUPABASE_URL !== "YOUR_SUPABASE_URL" && !!SUPABASE_ANON_KEY;
+  const supabaseClient = authIsConfigured && supabaseSdkAvailable
     ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     : null;
 
   let currentUser = null;
+  let authServiceOffline = !supabaseClient;
+  let profileSaveTimer = null;
 
-  // Guest defaults, used until (or unless) someone logs in.
-  // Guest progress lives in memory only and resets on reload.
-  window.arcadeSettings = {
+  const DEFAULT_SETTINGS = {
     displayName: 'You',
     accent: '#33fff0',
     scanlines: true,
     credits: 20
   };
+
+  // Guest defaults, used until (or unless) someone logs in.
+  window.arcadeSettings = { ...DEFAULT_SETTINGS };
 
   const settingsBtn = document.getElementById('settingsBtn');
   const settingsOverlay = document.getElementById('settingsOverlay');
@@ -1019,6 +1025,72 @@
   const signupBtn = document.getElementById('signupBtn');
   const logoutBtn = document.getElementById('logoutBtn');
 
+  const gateEmail = document.getElementById('gateEmail');
+  const gatePassword = document.getElementById('gatePassword');
+  const gateMessage = document.getElementById('authGateMessage');
+  const gateLoginBtn = document.getElementById('gateLoginBtn');
+  const gateSignupBtn = document.getElementById('gateSignupBtn');
+
+  function cloneDefaults() {
+    return { ...DEFAULT_SETTINGS };
+  }
+
+  function profileCacheKey(userId) {
+    return 'arcade_profile_' + userId;
+  }
+
+  function pendingProfileKey(userId) {
+    return 'arcade_profile_pending_' + userId;
+  }
+
+  function readLocalProfile(userId) {
+    try {
+      const raw = localStorage.getItem(profileCacheKey(userId));
+      return raw ? JSON.parse(raw) : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function writeLocalProfile(userId, settings) {
+    try {
+      localStorage.setItem(profileCacheKey(userId), JSON.stringify(settings));
+    } catch (_) {
+      // Storage can be disabled/full. The in-memory settings still work.
+    }
+  }
+
+  function readPendingPatch(userId) {
+    try {
+      const raw = localStorage.getItem(pendingProfileKey(userId));
+      return raw ? JSON.parse(raw) : {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function writePendingPatch(userId, patch) {
+    try {
+      localStorage.setItem(pendingProfileKey(userId), JSON.stringify(patch));
+    } catch (_) {}
+  }
+
+  function clearPendingPatch(userId) {
+    try {
+      localStorage.removeItem(pendingProfileKey(userId));
+    } catch (_) {}
+  }
+
+  function applyProfileData(data) {
+    window.arcadeSettings = {
+      displayName: data?.display_name || DEFAULT_SETTINGS.displayName,
+      accent: data?.accent || DEFAULT_SETTINGS.accent,
+      scanlines: typeof data?.scanlines === 'boolean' ? data.scanlines : DEFAULT_SETTINGS.scanlines,
+      credits: Number.isFinite(Number(data?.credits)) ? Number(data.credits) : DEFAULT_SETTINGS.credits
+    };
+    applySettingsToUI();
+  }
+
   function applySettingsToUI() {
     swatchRow.querySelectorAll('.swatch').forEach(s => {
       s.classList.toggle('selected', s.dataset.color === window.arcadeSettings.accent);
@@ -1029,62 +1101,45 @@
     updateCreditsDisplay();
   }
 
-  async function loadProfile(user) {
-    const { data, error } = await supabaseClient
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .maybeSingle();
+  function isNetworkError(error) {
+    if (!error) return false;
+    const status = Number(error.status || error.statusCode || 0);
+    const message = String(error.message || error.name || '').toLowerCase();
+    return !navigator.onLine ||
+      status === 0 || status === 502 || status === 503 || status === 504 ||
+      /failed to fetch|network|offline|timeout|timed out|fetch failed|dns|refused|unreachable/.test(message);
+  }
 
-    if (error) {
-      authMessage.textContent = 'Could not load your profile: ' + error.message;
-      return;
-    }
+  function withTimeout(promise, ms = 8000) {
+    return Promise.race([
+      promise,
+      new Promise(resolve => setTimeout(() => resolve({
+        data: null,
+        error: { message: 'Supabase request timed out.', status: 0 }
+      }), ms))
+    ]);
+  }
 
-    if (!data) {
-      // First time this user has logged in -- create their profile row.
-      const defaults = {
-        id: user.id,
-        display_name: 'You',
-        accent: '#33fff0',
-        scanlines: true,
-        credits: 20
-      };
-      await supabaseClient.from('profiles').insert(defaults);
-      window.arcadeSettings = {
-        displayName: defaults.display_name,
-        accent: defaults.accent,
-        scanlines: defaults.scanlines,
-        credits: defaults.credits
-      };
-    } else {
-      window.arcadeSettings = {
-        displayName: data.display_name,
-        accent: data.accent,
-        scanlines: data.scanlines,
-        credits: data.credits
-      };
-    }
+  function setAuthMessage(message, gateOnly = false) {
+    if (!gateOnly && authMessage) authMessage.textContent = message || '';
+    if (gateMessage) gateMessage.textContent = message || '';
+  }
 
+  function enterGuestMode(message) {
+    currentUser = null;
+    loggedOutView.style.display = 'block';
+    loggedInView.style.display = 'none';
+    document.body.classList.remove('gated');
+    window.arcadeSettings = cloneDefaults();
     applySettingsToUI();
+    if (message) setAuthMessage(message);
   }
-
-  async function saveProfile(patch) {
-    if (!currentUser || !authIsConfigured) return;
-    await supabaseClient.from('profiles').update(patch).eq('id', currentUser.id);
-  }
-
-  // Exposed so the game-click handler (below, in the other script)
-  // can persist a credit spend when someone is logged in.
-  window.persistCredits = function (newCredits) {
-    if (currentUser) saveProfile({ credits: newCredits });
-  };
 
   function showLoggedIn(user) {
     currentUser = user;
     loggedOutView.style.display = 'none';
     loggedInView.style.display = 'block';
-    loggedInEmail.textContent = user.email;
+    loggedInEmail.textContent = user.email || 'Signed in';
     document.body.classList.remove('gated');
   }
 
@@ -1092,110 +1147,285 @@
     currentUser = null;
     loggedOutView.style.display = 'block';
     loggedInView.style.display = 'none';
-    window.arcadeSettings = {
-      displayName: 'You',
-      accent: '#33fff0',
-      scanlines: true,
-      credits: 20
-    };
+    window.arcadeSettings = cloneDefaults();
     applySettingsToUI();
     document.body.classList.add('gated');
   }
 
-  if (authIsConfigured) {
-    signupBtn.addEventListener('click', async () => {
-      const email = authEmail.value.trim();
-      const password = authPassword.value;
-      if (!email || !password) {
-        authMessage.textContent = 'Enter an email and password.';
-        return;
-      }
-      const { data, error } = await supabaseClient.auth.signUp({ email, password });
-      if (error) {
-        authMessage.textContent = error.message;
-      } else if (data.user && !data.session) {
-        authMessage.textContent = 'Check your email to confirm your account, then log in.';
-      } else if (data.session) {
-        await loadProfile(data.user);
-        showLoggedIn(data.user);
-      }
-    });
+  function markSupabaseOffline(message = 'Account service is offline. You can keep using the site as a guest.') {
+    authServiceOffline = true;
+    enterGuestMode(message);
+  }
 
-    loginBtn.addEventListener('click', async () => {
-      const email = authEmail.value.trim();
-      const password = authPassword.value;
+  async function loadProfile(user) {
+    if (!user) return false;
+
+    // Always have a local fallback so a database outage cannot blank the UI.
+    const cached = readLocalProfile(user.id);
+    if (cached) applyProfileData(cached);
+
+    if (!supabaseClient || authServiceOffline) {
+      if (!cached) applyProfileData(cloneDefaults());
+      return false;
+    }
+
+    try {
+      const result = await withTimeout(
+        supabaseClient.from('profiles').select('*').eq('id', user.id).maybeSingle()
+      );
+      const { data, error } = result;
+
+      if (error) {
+        if (isNetworkError(error)) {
+          if (!cached) applyProfileData(cloneDefaults());
+          markSupabaseOffline('Supabase is temporarily unavailable. Your site is still usable, and your profile changes will be kept locally.');
+          return false;
+        }
+        authMessage.textContent = 'Could not load your profile: ' + error.message;
+        if (!cached) applyProfileData(cloneDefaults());
+        return false;
+      }
+
+      if (!data) {
+        const defaults = {
+          id: user.id,
+          display_name: DEFAULT_SETTINGS.displayName,
+          accent: DEFAULT_SETTINGS.accent,
+          scanlines: DEFAULT_SETTINGS.scanlines,
+          credits: DEFAULT_SETTINGS.credits
+        };
+        const insertResult = await withTimeout(supabaseClient.from('profiles').insert(defaults));
+        if (insertResult.error) {
+          if (isNetworkError(insertResult.error)) {
+            writeLocalProfile(user.id, window.arcadeSettings);
+            markSupabaseOffline('Supabase is temporarily unavailable. Your new profile is being kept locally for now.');
+            return false;
+          }
+          // RLS/duplicate/other database errors should not destroy the session.
+          applyProfileData(cached || defaults);
+          writeLocalProfile(user.id, window.arcadeSettings);
+          return false;
+        }
+        applyProfileData(defaults);
+        writeLocalProfile(user.id, window.arcadeSettings);
+      } else {
+        applyProfileData(data);
+        writeLocalProfile(user.id, window.arcadeSettings);
+      }
+      return true;
+    } catch (error) {
+      if (!cached) applyProfileData(cloneDefaults());
+      if (isNetworkError(error)) {
+        markSupabaseOffline('Supabase is temporarily unavailable. You can keep using the site as a guest.');
+      } else {
+        authMessage.textContent = 'Profile service error. Your session is still available.';
+      }
+      return false;
+    }
+  }
+
+  async function saveProfile(patch) {
+    if (!currentUser || !authIsConfigured) return false;
+
+    // Apply the change locally first so the UI never waits for Supabase.
+    const merged = {
+      ...window.arcadeSettings,
+      ...(patch.display_name !== undefined ? { displayName: patch.display_name } : {}),
+      ...(patch.accent !== undefined ? { accent: patch.accent } : {}),
+      ...(patch.scanlines !== undefined ? { scanlines: patch.scanlines } : {}),
+      ...(patch.credits !== undefined ? { credits: Number(patch.credits) } : {})
+    };
+    window.arcadeSettings = merged;
+    writeLocalProfile(currentUser.id, merged);
+
+    if (!supabaseClient || authServiceOffline) {
+      const pending = { ...readPendingPatch(currentUser.id), ...patch };
+      writePendingPatch(currentUser.id, pending);
+      return false;
+    }
+
+    try {
+      const { error } = await withTimeout(
+        supabaseClient.from('profiles').update(patch).eq('id', currentUser.id)
+      );
+      if (error) {
+        const pending = { ...readPendingPatch(currentUser.id), ...patch };
+        writePendingPatch(currentUser.id, pending);
+        if (isNetworkError(error)) {
+          authServiceOffline = true;
+          if (authMessage) authMessage.textContent = 'Supabase is offline. Your change was saved on this device and will retry when it is back.';
+        }
+        return false;
+      }
+      const pending = readPendingPatch(currentUser.id);
+      if (Object.keys(pending).length) clearPendingPatch(currentUser.id);
+      return true;
+    } catch (error) {
+      writePendingPatch(currentUser.id, { ...readPendingPatch(currentUser.id), ...patch });
+      if (isNetworkError(error)) authServiceOffline = true;
+      return false;
+    }
+  }
+
+  async function flushPendingProfile() {
+    if (!currentUser || !supabaseClient) return;
+    const pending = readPendingPatch(currentUser.id);
+    if (!Object.keys(pending).length) {
+      authServiceOffline = false;
+      return;
+    }
+
+    try {
+      const { error } = await withTimeout(
+        supabaseClient.from('profiles').update(pending).eq('id', currentUser.id)
+      );
+      if (!error) {
+        clearPendingPatch(currentUser.id);
+        authServiceOffline = false;
+        if (authMessage) authMessage.textContent = '';
+      }
+    } catch (_) {}
+  }
+
+  // Exposed so the game-click handler can persist a credit spend.
+  window.persistCredits = function (newCredits) {
+    if (currentUser) saveProfile({ credits: newCredits });
+    else window.arcadeSettings.credits = newCredits;
+    updateCreditsDisplay();
+  };
+
+  async function runAuthAction(action, gateOnly = false) {
+    if (!supabaseClient) {
+      markSupabaseOffline('Account service is unavailable right now. The arcade is still available in guest mode.');
+      return null;
+    }
+
+    const result = await withTimeout(action);
+    if (result.error && isNetworkError(result.error)) {
+      markSupabaseOffline('Supabase is temporarily offline. The arcade will keep working in guest mode.');
+    }
+    return result;
+  }
+
+  if (!supabaseClient) {
+    markSupabaseOffline(
+      supabaseSdkAvailable
+        ? 'Supabase is not configured. The arcade is still available in guest mode.'
+        : 'Supabase could not be reached, so the arcade is available in guest mode.'
+    );
+  } else {
+    async function handleLogin(email, password, gateOnly = false) {
       if (!email || !password) {
-        authMessage.textContent = 'Enter an email and password.';
+        setAuthMessage('Enter an email and password.', gateOnly);
         return;
       }
-      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+      const result = await runAuthAction(
+        supabaseClient.auth.signInWithPassword({ email, password }),
+        gateOnly
+      );
+      if (!result) return;
+
+      const { data, error } = result;
       if (error) {
-        authMessage.textContent = error.message;
-      } else {
+        setAuthMessage(error.message || 'Could not log in.', gateOnly);
+        return;
+      }
+
+      setAuthMessage('', gateOnly);
+      await loadProfile(data.user);
+      showLoggedIn(data.user);
+      await flushPendingProfile();
+    }
+
+    async function handleSignup(email, password, gateOnly = false) {
+      if (!email || !password) {
+        setAuthMessage('Enter an email and password.', gateOnly);
+        return;
+      }
+
+      const result = await runAuthAction(
+        supabaseClient.auth.signUp({ email, password }),
+        gateOnly
+      );
+      if (!result) return;
+
+      const { data, error } = result;
+      if (error) {
+        setAuthMessage(error.message || 'Could not create the account.', gateOnly);
+      } else if (data.user && !data.session) {
+        setAuthMessage('Check your email to confirm your account, then log in.', gateOnly);
+      } else if (data.session) {
+        setAuthMessage('', gateOnly);
         await loadProfile(data.user);
         showLoggedIn(data.user);
+        await flushPendingProfile();
       }
-    });
+    }
+
+    signupBtn.addEventListener('click', () =>
+      handleSignup(authEmail.value.trim(), authPassword.value, false)
+    );
+
+    loginBtn.addEventListener('click', () =>
+      handleLogin(authEmail.value.trim(), authPassword.value, false)
+    );
 
     logoutBtn.addEventListener('click', async () => {
-      await supabaseClient.auth.signOut();
+      try {
+        if (supabaseClient) await withTimeout(supabaseClient.auth.signOut());
+      } catch (_) {}
       showLoggedOut();
     });
 
-    // If someone's already logged in from a previous visit, restore them.
-    supabaseClient.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        loadProfile(data.session.user).then(() => showLoggedIn(data.session.user));
+    // Restore a session from Supabase's local auth storage. If the network is
+    // down, cached profile data can still populate the account UI.
+    (async () => {
+      try {
+        const { data, error } = await withTimeout(supabaseClient.auth.getSession());
+        if (error) {
+          if (isNetworkError(error)) markSupabaseOffline('Supabase is temporarily offline. The arcade is available in guest mode.');
+          return;
+        }
+        if (data?.session?.user) {
+          const user = data.session.user;
+          await loadProfile(user);
+          showLoggedIn(user);
+          await flushPendingProfile();
+        }
+      } catch (error) {
+        if (isNetworkError(error)) markSupabaseOffline('Supabase is temporarily offline. The arcade is available in guest mode.');
+      }
+    })();
+
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        showLoggedOut();
+      } else if (session?.user) {
+        // Do not block the auth event callback on a database request.
+        loadProfile(session.user).then(() => showLoggedIn(session.user));
       }
     });
 
-    // ---- Login gate (blocks the whole site until signed in) ----
-    const gateEmail = document.getElementById('gateEmail');
-    const gatePassword = document.getElementById('gatePassword');
-    const gateMessage = document.getElementById('authGateMessage');
-    const gateLoginBtn = document.getElementById('gateLoginBtn');
-    const gateSignupBtn = document.getElementById('gateSignupBtn');
+    gateLoginBtn.addEventListener('click', () =>
+      handleLogin(gateEmail.value.trim(), gatePassword.value, true)
+    );
 
-    gateLoginBtn.addEventListener('click', async () => {
-      const email = gateEmail.value.trim();
-      const password = gatePassword.value;
-      if (!email || !password) {
-        gateMessage.textContent = 'Enter an email and password.';
-        return;
-      }
-      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-      if (error) {
-        gateMessage.textContent = error.message;
-      } else {
-        gateMessage.textContent = '';
-        await loadProfile(data.user);
-        showLoggedIn(data.user);
-      }
+    gateSignupBtn.addEventListener('click', () =>
+      handleSignup(gateEmail.value.trim(), gatePassword.value, true)
+    );
+
+    window.addEventListener('online', async () => {
+      if (!supabaseClient || !currentUser) return;
+      authServiceOffline = false;
+      await flushPendingProfile();
+      await loadProfile(currentUser);
     });
 
-    gateSignupBtn.addEventListener('click', async () => {
-      const email = gateEmail.value.trim();
-      const password = gatePassword.value;
-      if (!email || !password) {
-        gateMessage.textContent = 'Enter an email and password.';
-        return;
-      }
-      const { data, error } = await supabaseClient.auth.signUp({ email, password });
-      if (error) {
-        gateMessage.textContent = error.message;
-      } else if (data.user && !data.session) {
-        gateMessage.textContent = 'Check your email to confirm your account, then log in.';
-      } else if (data.session) {
-        gateMessage.textContent = '';
-        await loadProfile(data.user);
-        showLoggedIn(data.user);
-      }
-    });
-  } else {
-    document.getElementById('accountSection').innerHTML =
-      '<label>Account</label><div style="font-size:0.8rem; color:var(--muted);">Accounts aren\'t set up yet.</div>';
-    // Accounts aren't configured yet -- don't lock people out of the site.
-    document.body.classList.remove('gated');
+    // Retry unsent profile changes periodically while the page remains open.
+    profileSaveTimer = window.setInterval(() => {
+      if (navigator.onLine && currentUser) flushPendingProfile();
+    }, 30000);
   }
 
   function openSettings() {
@@ -1263,14 +1493,14 @@
     "Learn To Fly 2", // 08
     "MineCraft!", // 09
     "Chat", // 10
-    "10 Minutes Till Dawn", // 11
-    "Pokemon Emerald", // 12
-    "Pokemon FireRed", // 13
-    "Soccer Random", // 14
-    "Basket Random", // 15
-    "Claude of Tanks", // 16
-    "UNDERTALE", // 17
-    "Trying to add fortnite", // 18
+    "COMING SOON!", // 11
+    "COMING SOON!", // 12
+    "COMING SOON!", // 13
+    "COMING SOON!", // 14
+    "COMING SOON!", // 15
+    "COMING SOON!", // 16
+    "COMING SOON!", // 17
+    "COMING SOON!", // 18
     "COMING SOON!", // 19
     "COMING SOON!", // 20
     "COMING SOON!", // 21
@@ -1319,46 +1549,46 @@
     "https://4yqt7wrhtx-ship-it.github.io/casual-games/learn-to-fly-2/", // 08
     "https://4yqt7wrhtx-ship-it.github.io/action-games/minecraft-15/", // 09
     "", // 10
-    "https://4yqt7wrhtx-ship-it.github.io/action-games/10-minutes-till-dawn", // 11
-    "https://4yqt7wrhtx-ship-it.github.io/action-games/pokemon-emerald", // 12
-    "https://4yqt7wrhtx-ship-it.github.io/action-games/pokemon-firered", // 13
-    "https://4yqt7wrhtx-ship-it.github.io/d.r.i.v.i.n.g-games/basket-random", // 14
-    "https://4yqt7wrhtx-ship-it.github.io/d.r.i.v.i.n.g-games/soccer-random", // 15
-    "https://claudeoftanks.kevinliu.studio", // 16
-    "https://wigdos-inc.github.io/Undertale-HTML/", // 17
-    "https://github.com/hsinidev/fortnite.git", // 18
-    "https://4yqt7wrhtx-ship-it.github.io", // 19
-    "https://4yqt7wrhtx-ship-it.github.io", // 20
-    "https://4yqt7wrhtx-ship-it.github.io", // 21
-    "https://4yqt7wrhtx-ship-it.github.io", // 22
-    "https://4yqt7wrhtx-ship-it.github.io", // 23
-    "https://4yqt7wrhtx-ship-it.github.io", // 24
-    "https://4yqt7wrhtx-ship-it.github.io", // 25
-    "https://4yqt7wrhtx-ship-it.github.io", // 26
-    "https://4yqt7wrhtx-ship-it.github.io", // 27
-    "https://4yqt7wrhtx-ship-it.github.io", // 28
-    "https://4yqt7wrhtx-ship-it.github.io", // 29
-    "https://4yqt7wrhtx-ship-it.github.io", // 30
-    "https://4yqt7wrhtx-ship-it.github.io", // 31
-    "https://4yqt7wrhtx-ship-it.github.io", // 32
-    "https://4yqt7wrhtx-ship-it.github.io", // 33
-    "https://4yqt7wrhtx-ship-it.github.io", // 34
-    "https://4yqt7wrhtx-ship-it.github.io", // 35
-    "https://4yqt7wrhtx-ship-it.github.io", // 36
-    "https://4yqt7wrhtx-ship-it.github.io", // 37
-    "https://4yqt7wrhtx-ship-it.github.io", // 38
-    "https://4yqt7wrhtx-ship-it.github.io", // 39
-    "https://4yqt7wrhtx-ship-it.github.io", // 40
-    "https://4yqt7wrhtx-ship-it.github.io", // 41
-    "https://4yqt7wrhtx-ship-it.github.io", // 42
-    "https://4yqt7wrhtx-ship-it.github.io", // 43
-    "https://4yqt7wrhtx-ship-it.github.io", // 44
-    "https://4yqt7wrhtx-ship-it.github.io", // 45
-    "https://4yqt7wrhtx-ship-it.github.io", // 46
-    "https://4yqt7wrhtx-ship-it.github.io", // 47
-    "https://4yqt7wrhtx-ship-it.github.io", // 48
-    "https://4yqt7wrhtx-ship-it.github.io", // 49
-    "https://4yqt7wrhtx-ship-it.github.io"  // 50
+    "", // 11
+    "", // 12
+    "", // 13
+    "", // 14
+    "", // 15
+    "", // 16
+    "", // 17
+    "", // 18
+    "", // 19
+    "", // 20
+    "", // 21
+    "", // 22
+    "", // 23
+    "", // 24
+    "", // 25
+    "", // 26
+    "", // 27
+    "", // 28
+    "", // 29
+    "", // 30
+    "", // 31
+    "", // 32
+    "", // 33
+    "", // 34
+    "", // 35
+    "", // 36
+    "", // 37
+    "", // 38
+    "", // 39
+    "", // 40
+    "", // 41
+    "", // 42
+    "", // 43
+    "", // 44
+    "", // 45
+    "", // 46
+    "", // 47
+    "", // 48
+    "", // 49
+    ""  // 50
   ];
 
   const controllerIcon = `
@@ -1520,8 +1750,24 @@
 `;
         aiGame.appendChild(script);
       } else {
+        const src = btn.dataset.src;
+
+        // Never try to display the Supabase project host as a game iframe.
+        // Supabase is an API/auth service, not an embeddable game page.
+        if (/^https?:\/\/[^/]+\.supabase\.co(?:\/|$)/i.test(src)) {
+          wrap.innerHTML = `
+            <p class="placeholder">
+              This game cannot be displayed here because its URL points to a Supabase service.<br><br>
+              Check that game's URL and make sure it points to the actual game page.
+            </p>
+          `;
+          return;
+        }
+
         const iframe = document.createElement('iframe');
-        iframe.src = btn.dataset.src;
+        iframe.src = src;
+        iframe.loading = 'lazy';
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
         iframe.setAttribute('title', 'Game ' + btn.querySelector('.slot-number').textContent);
         iframe.setAttribute('allowfullscreen', '');
         wrap.appendChild(iframe);

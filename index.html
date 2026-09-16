@@ -2360,11 +2360,39 @@
   // pointing to an audio file you've uploaded to your repo (e.g.
   // a "music" folder next to index.html). Files you can add:
   // mp3, ogg, or wav all work in the <audio> element.
-  const TRACKS = [
-    { title: 'White Ferrari', src: 'music/Frank Ocean - White Ferrari - Blonded (youtube).mp3' }
-    { title: 'Track 2', src: 'music/track2.mp3' },
-    { title: 'Track 3', src: 'music/track3.mp3' }
-  ];
+ const TRACKS = [
+  { title: 'White Ferrari', src: 'music/white-ferrari.mp3' },
+  { title: 'Track 2', src: 'music/track2.mp3' },
+  { title: 'Track 3', src: 'music/track3.mp3' }
+];
+
+function playTrack(index) {
+  if (index < 0 || index >= TRACKS.length) return;
+
+  currentTrackIndex = index;
+  const track = TRACKS[index];
+
+  audioPlayer.pause();
+  audioPlayer.src = track.src;
+  audioPlayer.load();
+
+  nowPlayingLabel.textContent = 'Loading...';
+
+  audioPlayer.play()
+    .then(() => {
+      nowPlayingLabel.textContent = track.title;
+      playPauseBtn.textContent = '⏸';
+      disc.classList.add('spinning');
+      refreshTrackHighlight();
+    })
+    .catch((error) => {
+      console.error('Music error:', error);
+      nowPlayingLabel.textContent = 'Could not play this track';
+      playPauseBtn.textContent = '▶';
+      disc.classList.remove('spinning');
+      refreshTrackHighlight();
+    });
+}
 
   const musicBtn = document.getElementById('musicBtn');
   const musicOverlay = document.getElementById('musicOverlay');

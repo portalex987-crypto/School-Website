@@ -158,18 +158,18 @@
   // PASTE YOUR OWN SUPABASE PROJECT URL AND ANON KEY BELOW --
   // same values you used in game-10.html.
   // ======================================================
-  const SUPABASE_URL = "https://oyzhwiufptwdtthjlagd.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_QzadsJMfQQOVdm4Jr6b02Q_bxpJwykn";
+  const SUPABASE_URL = "YOUR_SUPABASE_URL";
+  const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
 
   // Simple passcode so random visitors can't casually open this
   // page. This is NOT real security -- anyone who views this
   // file's source can see the passcode. Don't rely on this alone
   // if the messages are sensitive.
-  const ADMIN_PASSCODE = "Potatoeslol$";
+  const ADMIN_PASSCODE = "changeme";
 
   // Same word list as game-10.html, used here just to highlight
   // rows that contain flagged language.
-  const BANNED_WORDS = ["fuck, fucking, fucked, fucker, shit, shitty, shithead, bitch, bastard, asshole, ass, dumbass, jackass, damn, goddamn, crap, bullshit, horseshit, piss, pissed, dick, dickhead, cock, pussy, cunt, prick, douche, douchebag, slut, whore, skank, jerkoff, craphead, fuckhead, pisshead, motherfucker, son of a bitch, screw you, screw off, shut the hell up, holy shit"];
+  const BANNED_WORDS = ["fuck", "shit", "bitch", "asshole", "bastard", "dick", "whore", "slut"];
 
   function containsBannedWord(text) {
     const lower = text.toLowerCase();
@@ -180,7 +180,7 @@
   }
 
   const app = document.getElementById('app');
-  const isConfigured = SUPABASE_URL !== "https://oyzhwiufptwdtthjlagd.supabase.coL";
+  const isConfigured = SUPABASE_URL !== "YOUR_SUPABASE_URL";
 
   if (!isConfigured) {
     app.innerHTML = `
@@ -228,7 +228,8 @@
           <tr>
             <th>Time</th>
             <th>Room</th>
-            <th>Name</th>
+            <th>From</th>
+            <th>To</th>
             <th>Message</th>
             <th></th>
           </tr>
@@ -247,12 +248,12 @@
         .limit(200);
 
       if (error) {
-        tbody.innerHTML = `<tr><td colspan="5" class="empty">Error loading messages: ${error.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="empty">Error loading messages: ${error.message}</td></tr>`;
         return;
       }
 
       if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="empty">No messages yet.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="empty">No messages yet.</td></tr>`;
         return;
       }
 
@@ -264,11 +265,13 @@
       const tr = document.createElement('tr');
       const flagged = containsBannedWord(m.text);
       const time = new Date(m.created_at).toLocaleString();
+      const toLabel = m.recipient ? escapeHtml(m.recipient) : 'Everyone';
 
       tr.innerHTML = `
         <td>${time}</td>
         <td>${escapeHtml(m.room_code)}</td>
         <td>${escapeHtml(m.name)}</td>
+        <td>${toLabel}</td>
         <td class="${flagged ? 'flagged' : ''}">${escapeHtml(m.text)}</td>
         <td><button class="del-btn" data-id="${m.id}">Delete</button></td>
       `;
@@ -298,10 +301,12 @@
         const m = payload.new;
         const flagged = containsBannedWord(m.text);
         const time = new Date(m.created_at).toLocaleString();
+        const toLabel = m.recipient ? escapeHtml(m.recipient) : 'Everyone';
         tr.innerHTML = `
           <td>${time}</td>
           <td>${escapeHtml(m.room_code)}</td>
           <td>${escapeHtml(m.name)}</td>
+          <td>${toLabel}</td>
           <td class="${flagged ? 'flagged' : ''}">${escapeHtml(m.text)}</td>
           <td><button class="del-btn" data-id="${m.id}">Delete</button></td>
         `;

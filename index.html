@@ -332,62 +332,59 @@
   .player-controls {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     gap: 12px;
-    margin-top: 2px;
-  }
-
-  .expand-game-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 9px;
-    min-width: 190px;
-    padding: 11px 16px;
+    margin-top: 10px;
+    padding: 4px;
     background: linear-gradient(155deg, var(--panel-hover) 0%, var(--panel) 60%);
     border: 2px solid var(--line);
     border-radius: 10px;
+  }
+
+  .expand-game-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex: 1;
+    padding: 14px 20px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
     color: var(--gold);
     font-family: 'Press Start 2P', monospace;
-    font-size: 0.58rem;
+    font-size: 0.68rem;
     letter-spacing: 0.03em;
     cursor: pointer;
-    box-shadow:
-      0 3px 0 rgba(0,0,0,0.45),
-      0 0 12px rgba(255,207,77,0.18),
-      inset 0 1px 0 rgba(255,255,255,0.05);
-    transition: border-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
   }
 
   .expand-game-btn:hover,
   .expand-game-btn:focus-visible {
-    border-color: var(--cyan);
+    background: rgba(51,255,240,0.10);
     color: var(--cyan);
     outline: none;
-    transform: translateY(-2px);
-    box-shadow:
-      0 5px 0 rgba(0,0,0,0.45),
-      0 0 16px rgba(51,255,240,0.35),
-      inset 0 1px 0 rgba(255,255,255,0.08);
   }
 
   .expand-game-btn:active {
-    transform: translateY(1px);
-    box-shadow: 0 1px 0 rgba(0,0,0,0.45);
+    transform: scale(0.98);
   }
 
   .expand-icon {
     font-family: Arial, sans-serif;
-    font-size: 1.1rem;
+    font-size: 1.4rem;
     line-height: 1;
+    filter: drop-shadow(0 0 4px currentColor);
   }
 
   .expand-hint {
     color: var(--muted);
     font-family: 'Press Start 2P', monospace;
-    font-size: 0.48rem;
+    font-size: 0.52rem;
     letter-spacing: 0.03em;
-    opacity: 0.9;
+    opacity: 0.85;
+    padding-right: 14px;
+    white-space: nowrap;
   }
 
   /* When the game player is in native browser fullscreen, keep the same arcade bezel. */
@@ -519,6 +516,355 @@
     box-shadow: 0 1px 0 rgba(0,0,0,0.45);
   }
 
+  /* ============== MUSIC BUTTON + PLAYER (top left) ============== */
+
+  #musicBtn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: linear-gradient(155deg, var(--panel-hover) 0%, var(--panel) 60%);
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    color: var(--pink);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    box-shadow:
+      0 3px 0 rgba(0,0,0,0.45),
+      0 0 12px rgba(255,46,136,0.25),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+    transition: border-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  }
+
+  #musicBtn:hover,
+  #musicBtn:focus-visible {
+    border-color: var(--pink);
+    outline: none;
+    transform: translateY(-2px);
+    box-shadow:
+      0 5px 0 rgba(0,0,0,0.45),
+      0 0 14px rgba(255,46,136,0.4),
+      inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+
+  #musicBtn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.45);
+  }
+
+  #musicBtn .note-icon {
+    font-size: 0.95rem;
+  }
+
+  body.gated #musicBtn {
+    display: none;
+  }
+
+  #musicOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5,4,10,0.75);
+    backdrop-filter: blur(2px);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  #musicOverlay.open {
+    display: flex;
+  }
+
+  #musicPanel {
+    width: 100%;
+    max-width: 340px;
+    max-height: 78vh;
+    overflow-y: auto;
+    background: linear-gradient(180deg, var(--panel) 0%, #100c1c 100%);
+    border: 3px solid var(--line);
+    border-radius: 16px;
+    box-shadow:
+      0 0 0 3px rgba(255,46,136,0.10),
+      0 0 40px rgba(255,46,136,0.15);
+    padding: 26px 22px;
+    position: relative;
+  }
+
+  #musicPanel::before,
+  #musicPanel::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--pink);
+    box-shadow: 0 0 8px var(--pink);
+  }
+
+  #musicPanel::before { left: 16px; }
+  #musicPanel::after { right: 16px; }
+
+  #musicPanel h2 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.78rem;
+    color: var(--pink);
+    text-shadow: 0 0 8px rgba(255,46,136,0.6);
+    margin: 0 0 20px;
+    text-align: center;
+    letter-spacing: 0.03em;
+  }
+
+  #discWrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 18px;
+  }
+
+  #disc {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle, var(--bg) 0 12px, transparent 13px),
+      repeating-radial-gradient(circle, #1c1430 0px, #1c1430 3px, #241a3d 3px, #241a3d 6px);
+    border: 3px solid var(--line);
+    box-shadow: 0 0 24px rgba(255,46,136,0.25), inset 0 0 20px rgba(0,0,0,0.5);
+    position: relative;
+  }
+
+  #disc::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--pink);
+    box-shadow: 0 0 10px var(--pink);
+  }
+
+  #disc.spinning {
+    animation: discSpin 3s linear infinite;
+  }
+
+  @keyframes discSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  #nowPlayingLabel {
+    text-align: center;
+    color: var(--text);
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+    min-height: 1.3em;
+    text-shadow: 0 0 6px rgba(255,46,136,0.4);
+  }
+
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .progress-row span {
+    font-size: 0.68rem;
+    color: var(--muted);
+    font-family: 'Press Start 2P', monospace;
+    min-width: 32px;
+  }
+
+  #progressTrack {
+    flex: 1;
+    height: 8px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  #progressFill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--pink), var(--cyan));
+    border-radius: 999px;
+    transition: width 0.15s linear;
+  }
+
+  .music-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-bottom: 20px;
+  }
+
+  .music-controls button {
+    background: linear-gradient(155deg, var(--panel-hover) 0%, var(--panel) 60%);
+    border: 2px solid var(--line);
+    color: var(--text);
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.4);
+    transition: border-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  }
+
+  .music-controls button:hover {
+    border-color: var(--pink);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 rgba(0,0,0,0.4), 0 0 12px rgba(255,46,136,0.4);
+  }
+
+  .music-controls button:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.4);
+  }
+
+  #playPauseBtn {
+    width: 58px;
+    height: 58px;
+    font-size: 1.4rem;
+    background: var(--pink);
+    color: #22030f;
+    border-color: var(--pink);
+    box-shadow: 0 3px 0 rgba(0,0,0,0.4), 0 0 16px rgba(255,46,136,0.5);
+  }
+
+  #playPauseBtn:hover {
+    box-shadow: 0 5px 0 rgba(0,0,0,0.4), 0 0 22px rgba(255,46,136,0.7) !important;
+  }
+
+  .volume-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+
+  .volume-row .volume-icon {
+    font-size: 1rem;
+  }
+
+  #volumeTrack {
+    flex: 1;
+    position: relative;
+    height: 10px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  #volumeFill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 60%;
+    background: linear-gradient(90deg, var(--pink), var(--cyan));
+    border-radius: 999px;
+    pointer-events: none;
+  }
+
+  #volumeHandle {
+    position: absolute;
+    top: 50%;
+    left: 60%;
+    width: 22px;
+    height: 22px;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(155deg, var(--panel-hover) 0%, var(--panel) 60%);
+    border: 2px solid var(--pink);
+    border-radius: 6px;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.4), 0 0 8px rgba(255,46,136,0.4);
+    cursor: grab;
+    transition: box-shadow 0.15s ease;
+  }
+
+  #volumeHandle:hover {
+    box-shadow: 0 2px 0 rgba(0,0,0,0.4), 0 0 14px rgba(255,46,136,0.6);
+  }
+
+  #volumeHandle:active,
+  #volumeHandle.dragging {
+    cursor: grabbing;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.4), 0 0 16px rgba(255,46,136,0.7);
+  }
+
+  .track-list-label {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.55rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .track-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .track-list li button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--text);
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .track-list li button:hover {
+    border-color: var(--pink);
+    background: var(--panel-hover);
+  }
+
+  .track-list li button::before {
+    content: '♪';
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  .track-list li button.playing {
+    border-color: var(--pink);
+    color: var(--pink);
+    font-weight: 700;
+    background: rgba(255,46,136,0.08);
+  }
+
+  .track-list li button.playing::before {
+    color: var(--pink);
+  }
+
   #settingsBtn .gear-icon {
     width: 16px;
     height: 16px;
@@ -546,6 +892,8 @@
   #settingsPanel {
     width: 100%;
     max-width: 380px;
+    max-height: 78vh;
+    overflow-y: auto;
     background: linear-gradient(180deg, var(--panel) 0%, #100c1c 100%);
     border: 3px solid var(--line);
     border-radius: 16px;
@@ -555,6 +903,19 @@
       inset 0 0 30px rgba(255,46,136,0.05);
     padding: 26px 22px 26px;
     position: relative;
+  }
+
+  #settingsPanel::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  #settingsPanel::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  #settingsPanel::-webkit-scrollbar-thumb {
+    background: var(--line);
+    border-radius: 8px;
   }
 
   #settingsPanel::before,
@@ -1157,6 +1518,48 @@
 </div>
 
 
+<button id="musicBtn" type="button">
+  <span class="note-icon">♪</span>
+  MUSIC
+</button>
+
+<div id="musicOverlay">
+  <div id="musicPanel">
+    <h2>MUSIC PLAYER</h2>
+
+    <div id="discWrap">
+      <div id="disc"></div>
+    </div>
+
+    <div id="nowPlayingLabel">No track selected</div>
+
+    <div class="progress-row">
+      <span id="currentTimeLabel">0:00</span>
+      <div id="progressTrack">
+        <div id="progressFill"></div>
+      </div>
+      <span id="durationLabel">0:00</span>
+    </div>
+
+    <div class="music-controls">
+      <button type="button" id="prevTrackBtn" aria-label="Previous track">⏮</button>
+      <button type="button" id="playPauseBtn" aria-label="Play or pause">▶</button>
+      <button type="button" id="nextTrackBtn" aria-label="Next track">⏭</button>
+    </div>
+
+    <div class="volume-row">
+      <span class="volume-icon">🔊</span>
+      <div id="volumeTrack">
+        <div id="volumeFill"></div>
+        <div id="volumeHandle"></div>
+      </div>
+    </div>
+
+    <span class="track-list-label">TRACKS</span>
+    <ul class="track-list" id="trackList"></ul>
+  </div>
+</div>
+
 <button id="settingsBtn" type="button">
   <svg class="gear-icon" viewBox="0 0 24 24">
     <circle cx="12" cy="12" r="3"/>
@@ -1706,6 +2109,17 @@
     updateCreditsDisplay();
   };
 
+  // Auto-regen: everyone gets +20 credits every 5 minutes, whether
+  // logged in or playing as a guest. Guests just get it added to
+  // their in-memory balance; logged-in players get it saved too.
+  const CREDIT_REGEN_AMOUNT = 20;
+  const CREDIT_REGEN_INTERVAL_MS = 5 * 60 * 1000;
+
+  setInterval(() => {
+    const newTotal = (window.arcadeSettings.credits || 0) + CREDIT_REGEN_AMOUNT;
+    window.persistCredits(newTotal);
+  }, CREDIT_REGEN_INTERVAL_MS);
+
   async function runAuthAction(action, gateOnly = false) {
     if (!supabaseClient) {
       markSupabaseOffline('Account service is unavailable right now. The arcade is still available in guest mode.');
@@ -1940,9 +2354,172 @@
     saveProfile({ display_name: name });
     closeSettings();
   });
+
+  // ============== MUSIC PLAYER ==============
+  // Add your own tracks here. Each needs a title and a src path
+  // pointing to an audio file you've uploaded to your repo (e.g.
+  // a "music" folder next to index.html). Files you can add:
+  // mp3, ogg, or wav all work in the <audio> element.
+  const TRACKS = [
+    { title: 'Track 1', src: 'music/track1.mp3' },
+    { title: 'Track 2', src: 'music/track2.mp3' },
+    { title: 'Track 3', src: 'music/track3.mp3' }
+  ];
+
+  const musicBtn = document.getElementById('musicBtn');
+  const musicOverlay = document.getElementById('musicOverlay');
+  const nowPlayingLabel = document.getElementById('nowPlayingLabel');
+  const playPauseBtn = document.getElementById('playPauseBtn');
+  const prevTrackBtn = document.getElementById('prevTrackBtn');
+  const nextTrackBtn = document.getElementById('nextTrackBtn');
+  const volumeTrack = document.getElementById('volumeTrack');
+  const volumeFill = document.getElementById('volumeFill');
+  const volumeHandle = document.getElementById('volumeHandle');
+  const trackListEl = document.getElementById('trackList');
+  const disc = document.getElementById('disc');
+  const progressTrack = document.getElementById('progressTrack');
+  const progressFill = document.getElementById('progressFill');
+  const currentTimeLabel = document.getElementById('currentTimeLabel');
+  const durationLabel = document.getElementById('durationLabel');
+
+  const audioPlayer = new Audio();
+  audioPlayer.volume = 0.6;
+  let currentTrackIndex = -1;
+
+  TRACKS.forEach((track, i) => {
+    const li = document.createElement('li');
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = track.title;
+    btn.addEventListener('click', () => playTrack(i));
+    li.appendChild(btn);
+    trackListEl.appendChild(li);
+  });
+
+  function refreshTrackHighlight() {
+    trackListEl.querySelectorAll('button').forEach((btn, i) => {
+      btn.classList.toggle('playing', i === currentTrackIndex && !audioPlayer.paused);
+    });
+  }
+
+  function formatTime(seconds) {
+    if (!isFinite(seconds) || seconds < 0) return '0:00';
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  }
+
+  function playTrack(index) {
+    if (index < 0 || index >= TRACKS.length) return;
+    currentTrackIndex = index;
+    audioPlayer.src = TRACKS[index].src;
+    audioPlayer.play().catch(() => {
+      nowPlayingLabel.textContent = 'Could not play this track';
+    });
+    nowPlayingLabel.textContent = TRACKS[index].title;
+    playPauseBtn.textContent = '⏸';
+    disc.classList.add('spinning');
+    refreshTrackHighlight();
+  }
+
+  playPauseBtn.addEventListener('click', () => {
+    if (currentTrackIndex === -1) {
+      playTrack(0);
+      return;
+    }
+    if (audioPlayer.paused) {
+      audioPlayer.play();
+      playPauseBtn.textContent = '⏸';
+      disc.classList.add('spinning');
+    } else {
+      audioPlayer.pause();
+      playPauseBtn.textContent = '▶';
+      disc.classList.remove('spinning');
+    }
+    refreshTrackHighlight();
+  });
+
+  prevTrackBtn.addEventListener('click', () => {
+    const next = currentTrackIndex <= 0 ? TRACKS.length - 1 : currentTrackIndex - 1;
+    playTrack(next);
+  });
+
+  nextTrackBtn.addEventListener('click', () => {
+    const next = currentTrackIndex >= TRACKS.length - 1 ? 0 : currentTrackIndex + 1;
+    playTrack(next);
+  });
+
+  audioPlayer.addEventListener('ended', () => {
+    nextTrackBtn.click();
+  });
+
+  audioPlayer.addEventListener('timeupdate', () => {
+    currentTimeLabel.textContent = formatTime(audioPlayer.currentTime);
+    durationLabel.textContent = formatTime(audioPlayer.duration);
+    const pct = audioPlayer.duration
+      ? (audioPlayer.currentTime / audioPlayer.duration) * 100
+      : 0;
+    progressFill.style.width = pct + '%';
+  });
+
+  progressTrack.addEventListener('click', (e) => {
+    if (!audioPlayer.duration) return;
+    const rect = progressTrack.getBoundingClientRect();
+    const pct = (e.clientX - rect.left) / rect.width;
+    audioPlayer.currentTime = pct * audioPlayer.duration;
+  });
+
+  function setVolume(pct) {
+    pct = Math.max(0, Math.min(100, pct));
+    audioPlayer.volume = pct / 100;
+    volumeFill.style.width = pct + '%';
+    volumeHandle.style.left = pct + '%';
+  }
+
+  function pctFromEvent(e) {
+    const rect = volumeTrack.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    return ((clientX - rect.left) / rect.width) * 100;
+  }
+
+  volumeTrack.addEventListener('click', (e) => {
+    if (e.target === volumeHandle) return;
+    setVolume(pctFromEvent(e));
+  });
+
+  let draggingVolume = false;
+
+  volumeHandle.addEventListener('pointerdown', (e) => {
+    draggingVolume = true;
+    volumeHandle.classList.add('dragging');
+    volumeHandle.setPointerCapture(e.pointerId);
+  });
+
+  volumeHandle.addEventListener('pointermove', (e) => {
+    if (!draggingVolume) return;
+    setVolume(pctFromEvent(e));
+  });
+
+  volumeHandle.addEventListener('pointerup', (e) => {
+    draggingVolume = false;
+    volumeHandle.classList.remove('dragging');
+    volumeHandle.releasePointerCapture(e.pointerId);
+  });
+
+  setVolume(60);
+
+  musicBtn.addEventListener('click', () => {
+    musicOverlay.classList.add('open');
+  });
+
+  musicOverlay.addEventListener('click', (e) => {
+    if (e.target === musicOverlay) musicOverlay.classList.remove('open');
+  });
 </script>
 
 <script>
+
+
   const TOTAL_GAMES = 50;
   const list = document.getElementById('gameList');
   const wrap = document.getElementById('playerFrameWrap');

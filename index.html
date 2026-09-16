@@ -153,6 +153,58 @@
     61%, 100% { opacity: 0.25; }
   }
 
+
+  .game-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 22px 0 16px;
+    padding: 10px 14px;
+    background: var(--panel);
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  }
+
+  .game-search-icon {
+    font-size: 1.25rem;
+    color: var(--gold);
+  }
+
+  #gameSearch {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--text);
+    font: 700 0.85rem 'Press Start 2P', monospace;
+  }
+
+  #gameSearch::placeholder {
+    color: var(--muted);
+    opacity: .8;
+  }
+
+  .search-status {
+    color: var(--muted);
+    font: 700 0.6rem 'Press Start 2P', monospace;
+    white-space: nowrap;
+  }
+
+  .game-list li.search-hidden {
+    display: none;
+  }
+
+  .no-search-results {
+    padding: 24px;
+    text-align: center;
+    color: var(--muted);
+    border: 2px dashed var(--line);
+    border-radius: 12px;
+    font: 700 0.7rem 'Press Start 2P', monospace;
+  }
+
   ul.game-list {
     list-style: none;
     margin: 0;
@@ -195,6 +247,77 @@
     background: linear-gradient(135deg, rgba(51,255,240,0.18), rgba(255,46,136,0.18));
     opacity: 0;
     transition: opacity 0.15s ease;
+  }
+
+  /* ============== FAVORITE STAR ============== */
+
+  .fav-star {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    z-index: 2;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(7,6,13,0.55);
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    color: var(--muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+  }
+
+  .fav-star:hover {
+    color: var(--gold);
+    border-color: var(--gold);
+    transform: scale(1.1);
+  }
+
+  .fav-star.favorited {
+    color: var(--gold);
+    border-color: var(--gold);
+    text-shadow: 0 0 6px rgba(255,207,77,0.7);
+  }
+
+  /* ============== FAVORITES SECTION ============== */
+
+  .favorites-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .favorites-section h2 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.75rem;
+    color: var(--gold);
+    text-shadow: 0 0 8px rgba(255,207,77,0.5);
+    margin: 0;
+    letter-spacing: 0.03em;
+  }
+
+  .favorites-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+  }
+
+  .favorites-list li {
+    flex: 0 0 100px;
+    aspect-ratio: 1 / 1;
+  }
+
+  .favorites-empty {
+    color: var(--muted);
+    font-size: 0.85rem;
+    padding: 4px 0;
   }
 
   .game-button:hover,
@@ -516,354 +639,212 @@
     box-shadow: 0 1px 0 rgba(0,0,0,0.45);
   }
 
-  /* ============== MUSIC BUTTON + PLAYER (top left) ============== */
-
-  #musicBtn {
+  /* ============== UPDATE BUTTON + LOG ============== */
+  #updatesBtn {
     position: fixed;
     top: 20px;
-    left: 20px;
+    left: 176px;
     z-index: 50;
     display: flex;
     align-items: center;
     gap: 8px;
     padding: 10px 16px;
-    background: linear-gradient(155deg, var(--panel-hover) 0%, var(--panel) 60%);
+    background: linear-gradient(155deg, var(--panel-hover), var(--panel));
     border: 2px solid var(--line);
     border-radius: 10px;
-    color: var(--pink);
+    color: var(--cyan);
     font-family: 'Press Start 2P', monospace;
-    font-size: 0.6rem;
-    letter-spacing: 0.04em;
+    font-size: .6rem;
+    letter-spacing: .04em;
     cursor: pointer;
-    box-shadow:
-      0 3px 0 rgba(0,0,0,0.45),
-      0 0 12px rgba(255,46,136,0.25),
-      inset 0 1px 0 rgba(255,255,255,0.05);
-    transition: border-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+    box-shadow: 0 3px 0 rgba(0,0,0,.45), 0 0 12px rgba(51,255,240,.22);
+    transition: border-color .15s ease, transform .1s ease, box-shadow .15s ease;
   }
-
-  #musicBtn:hover,
-  #musicBtn:focus-visible {
-    border-color: var(--pink);
+  #updatesBtn:hover, #updatesBtn:focus-visible {
+    border-color: var(--cyan);
     outline: none;
     transform: translateY(-2px);
-    box-shadow:
-      0 5px 0 rgba(0,0,0,0.45),
-      0 0 14px rgba(255,46,136,0.4),
-      inset 0 1px 0 rgba(255,255,255,0.08);
+    box-shadow: 0 5px 0 rgba(0,0,0,.45), 0 0 18px rgba(51,255,240,.45);
   }
+  #updatesBtn:active { transform: translateY(0); }
+  #updatesBtn span { font-size: .8rem; }
+  body.gated #updatesBtn { display:none; }
 
-  #musicBtn:active {
-    transform: translateY(0);
-    box-shadow: 0 1px 0 rgba(0,0,0,0.45);
-  }
-
-  #musicBtn .note-icon {
-    font-size: 0.95rem;
-  }
-
-  body.gated #musicBtn {
-    display: none;
-  }
-
-  #musicOverlay {
+  #updatesOverlay {
     position: fixed;
     inset: 0;
-    background: rgba(5,4,10,0.75);
-    backdrop-filter: blur(2px);
     z-index: 100;
     display: none;
     align-items: center;
     justify-content: center;
     padding: 24px;
+    background: radial-gradient(circle at 50% 30%, rgba(51,255,240,.08), transparent 35%), rgba(4,3,10,.84);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
   }
+  #updatesOverlay.open { display: flex; }
 
-  #musicOverlay.open {
-    display: flex;
-  }
-
-  #musicPanel {
+  #updatesPanel {
     width: 100%;
-    max-width: 340px;
-    max-height: 78vh;
+    max-width: 620px;
+    max-height: 86vh;
     overflow-y: auto;
-    background: linear-gradient(180deg, var(--panel) 0%, #100c1c 100%);
-    border: 3px solid var(--line);
-    border-radius: 16px;
-    box-shadow:
-      0 0 0 3px rgba(255,46,136,0.10),
-      0 0 40px rgba(255,46,136,0.15);
-    padding: 26px 22px;
     position: relative;
+    padding: 26px;
+    background: linear-gradient(145deg, rgba(30,22,51,.98), rgba(10,8,20,.98));
+    border: 2px solid var(--cyan);
+    border-radius: 20px;
+    box-shadow: 0 0 0 1px rgba(255,46,136,.25), 0 0 45px rgba(51,255,240,.22), 0 28px 80px rgba(0,0,0,.55);
   }
-
-  #musicPanel::before,
-  #musicPanel::after {
+  #updatesPanel::before {
     content: '';
     position: absolute;
-    top: 12px;
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: var(--pink);
-    box-shadow: 0 0 8px var(--pink);
-  }
-
-  #musicPanel::before { left: 16px; }
-  #musicPanel::after { right: 16px; }
-
-  #musicPanel h2 {
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.78rem;
-    color: var(--pink);
-    text-shadow: 0 0 8px rgba(255,46,136,0.6);
-    margin: 0 0 20px;
-    text-align: center;
-    letter-spacing: 0.03em;
-  }
-
-  #discWrap {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 18px;
-  }
-
-  #disc {
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    background:
-      radial-gradient(circle, var(--bg) 0 12px, transparent 13px),
-      repeating-radial-gradient(circle, #1c1430 0px, #1c1430 3px, #241a3d 3px, #241a3d 6px);
-    border: 3px solid var(--line);
-    box-shadow: 0 0 24px rgba(255,46,136,0.25), inset 0 0 20px rgba(0,0,0,0.5);
-    position: relative;
-  }
-
-  #disc::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    margin: auto;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: var(--pink);
-    box-shadow: 0 0 10px var(--pink);
-  }
-
-  #disc.spinning {
-    animation: discSpin 3s linear infinite;
-  }
-
-  @keyframes discSpin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-
-  #nowPlayingLabel {
-    text-align: center;
-    color: var(--text);
-    font-size: 0.95rem;
-    font-weight: 700;
-    margin-bottom: 14px;
-    min-height: 1.3em;
-    text-shadow: 0 0 6px rgba(255,46,136,0.4);
-  }
-
-  .progress-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 20px;
-  }
-
-  .progress-row span {
-    font-size: 0.68rem;
-    color: var(--muted);
-    font-family: 'Press Start 2P', monospace;
-    min-width: 32px;
-  }
-
-  #progressTrack {
-    flex: 1;
-    height: 8px;
-    background: var(--bg);
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    overflow: hidden;
-    cursor: pointer;
-  }
-
-  #progressFill {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, var(--pink), var(--cyan));
-    border-radius: 999px;
-    transition: width 0.15s linear;
-  }
-
-  .music-controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 18px;
-    margin-bottom: 20px;
-  }
-
-  .music-controls button {
-    background: linear-gradient(155deg, var(--panel-hover) 0%, var(--panel) 60%);
-    border: 2px solid var(--line);
-    color: var(--text);
-    border-radius: 50%;
-    width: 42px;
-    height: 42px;
-    font-size: 0.95rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 3px 0 rgba(0,0,0,0.4);
-    transition: border-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
-  }
-
-  .music-controls button:hover {
-    border-color: var(--pink);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 0 rgba(0,0,0,0.4), 0 0 12px rgba(255,46,136,0.4);
-  }
-
-  .music-controls button:active {
-    transform: translateY(1px);
-    box-shadow: 0 1px 0 rgba(0,0,0,0.4);
-  }
-
-  #playPauseBtn {
-    width: 58px;
-    height: 58px;
-    font-size: 1.4rem;
-    background: var(--pink);
-    color: #22030f;
-    border-color: var(--pink);
-    box-shadow: 0 3px 0 rgba(0,0,0,0.4), 0 0 16px rgba(255,46,136,0.5);
-  }
-
-  #playPauseBtn:hover {
-    box-shadow: 0 5px 0 rgba(0,0,0,0.4), 0 0 22px rgba(255,46,136,0.7) !important;
-  }
-
-  .volume-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 22px;
-  }
-
-  .volume-row .volume-icon {
-    font-size: 1rem;
-  }
-
-  #volumeTrack {
-    flex: 1;
-    position: relative;
-    height: 10px;
-    background: var(--bg);
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    cursor: pointer;
-  }
-
-  #volumeFill {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 60%;
-    background: linear-gradient(90deg, var(--pink), var(--cyan));
-    border-radius: 999px;
+    inset: 8px;
+    border: 1px solid rgba(255,46,136,.14);
+    border-radius: 14px;
     pointer-events: none;
   }
-
-  #volumeHandle {
-    position: absolute;
-    top: 50%;
-    left: 60%;
-    width: 22px;
-    height: 22px;
-    transform: translate(-50%, -50%);
-    background: linear-gradient(155deg, var(--panel-hover) 0%, var(--panel) 60%);
-    border: 2px solid var(--pink);
-    border-radius: 6px;
-    box-shadow: 0 2px 0 rgba(0,0,0,0.4), 0 0 8px rgba(255,46,136,0.4);
-    cursor: grab;
-    transition: box-shadow 0.15s ease;
+  #updatesPanel h2 {
+    position: relative;
+    margin: 0 0 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px dashed var(--line);
+    color: var(--cyan);
+    text-shadow: 0 0 10px rgba(51,255,240,.65);
+    font: 700 .95rem 'Press Start 2P', monospace;
+    letter-spacing: .04em;
   }
-
-  #volumeHandle:hover {
-    box-shadow: 0 2px 0 rgba(0,0,0,0.4), 0 0 14px rgba(255,46,136,0.6);
-  }
-
-  #volumeHandle:active,
-  #volumeHandle.dragging {
-    cursor: grabbing;
-    box-shadow: 0 1px 0 rgba(0,0,0,0.4), 0 0 16px rgba(255,46,136,0.7);
-  }
-
-  .track-list-label {
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.55rem;
-    color: var(--muted);
-    letter-spacing: 0.05em;
-    margin-bottom: 10px;
-    display: block;
-  }
-
-  .track-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .track-list li button {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-align: left;
-    background: var(--bg);
+  .update-entry {
+    position: relative;
+    margin-bottom: 12px;
+    padding: 15px 16px;
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: 12px;
+    background: rgba(7,6,13,.55);
+  }
+  .update-date {
+    color: var(--gold);
+    font: 700 .48rem 'Press Start 2P', monospace;
+    letter-spacing: .07em;
+    margin-bottom: 8px;
+  }
+  .update-title {
     color: var(--text);
-    padding: 10px 14px;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: border-color 0.15s ease, background 0.15s ease;
+    font-size: 1rem;
+    font-weight: 900;
+    margin-bottom: 5px;
   }
-
-  .track-list li button:hover {
-    border-color: var(--pink);
-    background: var(--panel-hover);
-  }
-
-  .track-list li button::before {
-    content: '♪';
+  .update-desc {
     color: var(--muted);
-    font-size: 0.8rem;
+    font-size: .82rem;
+    line-height: 1.5;
+  }
+  .close-updates {
+    position: relative;
+    margin-top: 8px;
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    background: var(--panel-hover);
+    color: var(--text);
+    font-family: 'Press Start 2P', monospace;
+    font-size: .55rem;
+    cursor: pointer;
+  }
+  .close-updates:hover { border-color: var(--pink); color: var(--pink); }
+
+  @media (max-width:700px) {
+    #updatesBtn { left: 128px; top: 12px; font-size:.48rem; padding:9px 10px; }
+    #updatesBtn span { font-size:.65rem; }
   }
 
-  .track-list li button.playing {
-    border-color: var(--pink);
-    color: var(--pink);
-    font-weight: 700;
-    background: rgba(255,46,136,0.08);
+  /* ============== MUSIC BUTTON + PLAYER ============== */
+  #musicBtn {
+    position: fixed; top: 20px; left: 20px; z-index: 50;
+    display: flex; align-items: center; gap: 8px; padding: 10px 16px;
+    background: linear-gradient(155deg, var(--panel-hover), var(--panel));
+    border: 2px solid var(--line); border-radius: 10px; color: var(--pink);
+    font-family: 'Press Start 2P', monospace; font-size: .6rem; letter-spacing: .04em; cursor: pointer;
+    box-shadow: 0 3px 0 rgba(0,0,0,.45), 0 0 12px rgba(255,46,136,.25);
+    transition: border-color .15s ease, transform .1s ease, box-shadow .15s ease;
   }
+  #musicBtn:hover, #musicBtn:focus-visible { border-color: var(--pink); outline: none; transform: translateY(-2px); box-shadow: 0 5px 0 rgba(0,0,0,.45), 0 0 18px rgba(255,46,136,.5); }
+  #musicBtn:active { transform: translateY(0); }
+  #musicBtn .note-icon { font-size: .95rem; }
+  body.gated #musicBtn { display:none; }
 
-  .track-list li button.playing::before {
-    color: var(--pink);
+  @media (max-width:700px) { #musicBtn { left:12px; top:12px; font-size:.52rem; padding:9px 11px; } }
+
+  #musicOverlay {
+    position:fixed; inset:0; background:radial-gradient(circle at 50% 35%, rgba(255,46,136,.10), transparent 35%), rgba(4,3,10,.84);
+    backdrop-filter:blur(7px); -webkit-backdrop-filter:blur(7px); z-index:100; display:none; align-items:center; justify-content:center; padding:24px;
   }
+  #musicOverlay.open { display:flex; }
+
+  #musicPanel {
+    width:100%; max-width:620px; max-height:88vh; overflow-y:auto; position:relative; padding:24px;
+    background:linear-gradient(145deg, rgba(30,22,51,.98), rgba(10,8,20,.98));
+    border:2px solid var(--pink); border-radius:22px;
+    box-shadow:0 0 0 1px rgba(51,255,240,.25), 0 0 45px rgba(255,46,136,.25), 0 28px 80px rgba(0,0,0,.55), inset 0 0 55px rgba(51,255,240,.035);
+  }
+  #musicPanel::-webkit-scrollbar { width:7px; }
+  #musicPanel::-webkit-scrollbar-thumb { background:var(--line); border-radius:99px; }
+  #musicPanel::before { content:''; position:absolute; inset:8px; border:1px solid rgba(51,255,240,.12); border-radius:16px; pointer-events:none; }
+
+  .music-close { position:absolute; top:15px; right:16px; z-index:3; width:34px; height:34px; border:1px solid var(--line); border-radius:10px; background:rgba(7,6,13,.65); color:var(--muted); font-size:1.45rem; line-height:1; cursor:pointer; }
+  .music-close:hover { color:var(--pink); border-color:var(--pink); box-shadow:0 0 12px rgba(255,46,136,.3); }
+  .music-topline { font:700 .52rem 'Press Start 2P',monospace; color:var(--muted); letter-spacing:.09em; margin:2px 48px 9px 4px; }
+  .music-live-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:#39ff6a; box-shadow:0 0 9px #39ff6a; margin-right:5px; }
+  .music-wave { color:var(--cyan); float:right; }
+  #musicPanel h2 { margin:0 0 18px; color:var(--pink); text-shadow:0 0 10px rgba(255,46,136,.7), 0 0 22px rgba(51,255,240,.15); font:700 .95rem 'Press Start 2P',monospace; letter-spacing:.04em; }
+
+  .music-hero { display:grid; grid-template-columns:170px 1fr; gap:24px; align-items:center; padding:20px; border:1px solid var(--line); border-radius:16px; background:linear-gradient(135deg, rgba(51,255,240,.055), rgba(255,46,136,.075)); }
+  #discWrap { display:flex; justify-content:center; align-items:center; position:relative; width:170px; height:170px; }
+  .disc-glow { position:absolute; width:145px; height:145px; border-radius:50%; background:radial-gradient(circle, rgba(255,46,136,.22), transparent 68%); filter:blur(5px); }
+  #disc { width:132px; height:132px; border-radius:50%; position:relative; display:flex; align-items:center; justify-content:center; background:radial-gradient(circle, #080611 0 8px, var(--pink) 9px 11px, transparent 12px), repeating-radial-gradient(circle, #171027 0 3px, #26163c 4px 6px); border:3px solid var(--line); box-shadow:0 0 26px rgba(255,46,136,.38), inset 0 0 25px rgba(0,0,0,.65); }
+  #disc::before { content:''; position:absolute; inset:15px; border-radius:50%; border:1px solid rgba(51,255,240,.22); }
+  .disc-center { color:var(--cyan); font-size:1.25rem; text-shadow:0 0 9px var(--cyan); }
+  #disc.spinning { animation:discSpin 3s linear infinite; }
+  @keyframes discSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  .music-info { min-width:0; }
+  .music-kicker { font:700 .5rem 'Press Start 2P',monospace; color:var(--cyan); letter-spacing:.08em; margin-bottom:8px; }
+  #nowPlayingLabel { color:var(--text); font-size:1.15rem; font-weight:900; min-height:1.5em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:13px; text-shadow:0 0 8px rgba(255,255,255,.12); }
+  .visualizer { height:35px; display:flex; align-items:center; gap:4px; margin:2px 0 14px; }
+  .visualizer i { display:block; width:5px; height:8px; border-radius:4px; background:linear-gradient(180deg,var(--cyan),var(--pink)); box-shadow:0 0 7px rgba(51,255,240,.35); animation:eq 1s ease-in-out infinite alternate; animation-play-state:paused; }
+  #disc.spinning ~ * {}
+  #musicPanel:has(#disc.spinning) .visualizer i { animation-play-state:running; }
+  .visualizer i:nth-child(2n){animation-duration:.72s}.visualizer i:nth-child(3n){animation-duration:1.25s}.visualizer i:nth-child(4n){animation-duration:.88s}
+  @keyframes eq { from{height:6px;opacity:.55} to{height:32px;opacity:1} }
+
+  .progress-row { display:flex; align-items:center; gap:9px; }
+  .progress-row span { font:700 .5rem 'Press Start 2P',monospace; color:var(--muted); min-width:31px; }
+  #progressTrack { flex:1; height:9px; background:var(--bg); border:1px solid var(--line); border-radius:99px; overflow:hidden; cursor:pointer; }
+  #progressFill { height:100%; width:0; background:linear-gradient(90deg,var(--pink),var(--cyan)); border-radius:99px; box-shadow:0 0 9px rgba(255,46,136,.55); }
+
+  .music-controls { display:flex; align-items:center; justify-content:center; gap:15px; margin:20px 0 16px; }
+  .music-controls button { width:46px; height:46px; border:2px solid var(--line); border-radius:13px; background:var(--panel); color:var(--text); font-size:1rem; cursor:pointer; box-shadow:0 3px 0 rgba(0,0,0,.4); transition:.15s ease; }
+  .music-controls button:hover { border-color:var(--pink); color:var(--pink); transform:translateY(-2px); box-shadow:0 0 15px rgba(255,46,136,.3); }
+  #playPauseBtn { width:64px; height:64px; border-radius:18px; background:linear-gradient(135deg,var(--pink),#c91f70); color:#21030e; border-color:var(--pink); font-size:1.35rem; box-shadow:0 0 22px rgba(255,46,136,.42),0 4px 0 rgba(0,0,0,.35); }
+
+  .volume-row { display:flex; align-items:center; gap:10px; padding:10px 12px; margin-bottom:18px; border:1px solid var(--line); border-radius:11px; background:rgba(7,6,13,.45); }
+  .volume-icon { color:var(--cyan); font-size:1rem; }
+  #volumeTrack { flex:1; position:relative; height:8px; background:var(--bg); border:1px solid var(--line); border-radius:99px; cursor:pointer; }
+  #volumeFill { position:absolute; inset:0 auto 0 0; width:60%; background:linear-gradient(90deg,var(--pink),var(--cyan)); border-radius:99px; }
+  #volumeHandle { position:absolute; top:50%; left:60%; width:18px; height:18px; transform:translate(-50%,-50%); background:var(--panel); border:2px solid var(--cyan); border-radius:50%; box-shadow:0 0 10px rgba(51,255,240,.45); cursor:grab; }
+  .volume-percent { font:700 .48rem 'Press Start 2P',monospace; color:var(--cyan); min-width:32px; text-align:right; }
+
+  .playlist-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .track-list-label { font:700 .55rem 'Press Start 2P',monospace; color:var(--muted); letter-spacing:.08em; }
+  #queueCount { font:700 .48rem 'Press Start 2P',monospace; color:var(--muted); }
+  .track-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px; }
+  .track-list li button { width:100%; display:flex; align-items:center; gap:11px; text-align:left; background:rgba(7,6,13,.58); border:1px solid var(--line); border-radius:10px; color:var(--text); padding:12px 14px; font-size:.82rem; cursor:pointer; transition:.15s ease; }
+  .track-list li button::before { content:'01'; color:var(--muted); font:700 .5rem 'Press Start 2P',monospace; }
+  .track-list li:nth-child(2) button::before{content:'02'}.track-list li:nth-child(3) button::before{content:'03'}
+  .track-list li button:hover { border-color:var(--cyan); background:rgba(51,255,240,.06); transform:translateX(2px); }
+  .track-list li button.playing { border-color:var(--pink); color:var(--pink); background:rgba(255,46,136,.08); box-shadow:inset 3px 0 0 var(--pink); }
+  .music-footer { display:flex; justify-content:space-between; margin-top:15px; padding-top:12px; border-top:1px dashed var(--line); color:var(--muted); font:700 .43rem 'Press Start 2P',monospace; letter-spacing:.04em; }
+  @media (max-width:600px) { #musicPanel{padding:20px; border-radius:17px} .music-hero{grid-template-columns:1fr;gap:12px;text-align:center} #discWrap{margin:auto} #nowPlayingLabel{font-size:1rem} .music-footer{font-size:.38rem} }
 
   #settingsBtn .gear-icon {
     width: 16px;
@@ -1523,22 +1504,62 @@
   MUSIC
 </button>
 
-<div id="musicOverlay">
-  <div id="musicPanel">
-    <h2>MUSIC PLAYER</h2>
+<button id="updatesBtn" type="button" aria-label="Open update log">
+  <span>✓</span>
+  UPDATES
+</button>
 
-    <div id="discWrap">
-      <div id="disc"></div>
+<div id="updatesOverlay" aria-hidden="true">
+  <div id="updatesPanel" role="dialog" aria-modal="true" aria-labelledby="updatesTitle">
+    <h2 id="updatesTitle">UPDATE LOG</h2>
+
+    <div class="update-entry">
+      <div class="update-date">LATEST BUILD</div>
+      <div class="update-title">Music Player</div>
+      <div class="update-desc">Click MUSIC in the top-left corner to open the music controls.</div>
     </div>
 
-    <div id="nowPlayingLabel">No track selected</div>
+    <div class="update-entry">
+      <div class="update-date">LATEST BUILD</div>
+      <div class="update-title">Update Log</div>
+      <div class="update-desc">Click UPDATES at the top of the arcade to view the latest changes.</div>
+    </div>
 
-    <div class="progress-row">
-      <span id="currentTimeLabel">0:00</span>
-      <div id="progressTrack">
-        <div id="progressFill"></div>
+    <div class="update-entry">
+      <div class="update-date">LATEST BUILD</div>
+      <div class="update-title">Arcade</div>
+      <div class="update-desc">Game loading, settings, accounts, fullscreen controls, and the rest of the arcade remain available.</div>
+    </div>
+
+    <button type="button" class="close-updates" id="closeUpdatesBtn">CLOSE</button>
+  </div>
+</div>
+
+<div id="musicOverlay" aria-hidden="true">
+  <div id="musicPanel" role="dialog" aria-modal="true" aria-labelledby="musicTitle">
+    <button type="button" id="closeMusicBtn" class="music-close" aria-label="Close music player">×</button>
+    <div class="music-topline"><span class="music-live-dot"></span> ARCADE RADIO <span class="music-wave">LIVE</span></div>
+    <h2 id="musicTitle">MUSIC // PLAYER</h2>
+
+    <div class="music-hero">
+      <div id="discWrap">
+        <div class="disc-glow"></div>
+        <div id="disc"><span class="disc-center">♫</span></div>
       </div>
-      <span id="durationLabel">0:00</span>
+      <div class="music-info">
+        <div class="music-kicker">NOW PLAYING</div>
+        <div id="nowPlayingLabel">No track selected</div>
+        <div class="visualizer" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <div class="progress-row">
+          <span id="currentTimeLabel">0:00</span>
+          <div id="progressTrack">
+            <div id="progressFill"></div>
+          </div>
+          <span id="durationLabel">0:00</span>
+        </div>
+      </div>
     </div>
 
     <div class="music-controls">
@@ -1548,15 +1569,17 @@
     </div>
 
     <div class="volume-row">
-      <span class="volume-icon">🔊</span>
+      <span class="volume-icon">◖</span>
       <div id="volumeTrack">
         <div id="volumeFill"></div>
         <div id="volumeHandle"></div>
       </div>
+      <span class="volume-percent" id="volumePercent">60%</span>
     </div>
 
-    <span class="track-list-label">TRACKS</span>
+    <div class="playlist-header"><span class="track-list-label">QUEUE</span><span id="queueCount">03 TRACKS</span></div>
     <ul class="track-list" id="trackList"></ul>
+    <div class="music-footer"><span>♪ STUDY HALL FM</span><span>ESC TO CLOSE</span></div>
   </div>
 </div>
 
@@ -1707,7 +1730,20 @@
     <p class="subtitle">Have Fun, More Games Out Soon</p>
   </header>
 
+  <div class="favorites-section" id="favoritesSection">
+    <h2>★ FAVORITES</h2>
+    <ul class="favorites-list" id="favoritesList"></ul>
+  </div>
+
+
+  <div class="game-search" role="search">
+    <span class="game-search-icon">⌕</span>
+    <input type="search" id="gameSearch" placeholder="Search games..." aria-label="Search games" autocomplete="off" spellcheck="false">
+    <span class="search-status" id="searchStatus">50 GAMES</span>
+  </div>
+
   <ul class="game-list" id="gameList"></ul>
+  <div class="no-search-results" id="noSearchResults" hidden>No games found. Try another search.</div>
 
   <div class="player">
     <div class="player-label">NOW PLAYING</div>
@@ -1747,11 +1783,12 @@
     displayName: 'You',
     accent: '#33fff0',
     scanlines: true,
-    credits: 20
+    credits: 20,
+    favorites: []
   };
 
   // Guest defaults, used until (or unless) someone logs in.
-  window.arcadeSettings = { ...DEFAULT_SETTINGS };
+  window.arcadeSettings = { ...DEFAULT_SETTINGS, favorites: [] };
 
   const settingsBtn = document.getElementById('settingsBtn');
   const settingsOverlay = document.getElementById('settingsOverlay');
@@ -1847,7 +1884,7 @@
   applyExtraSettings(extraSettings);
 
   function cloneDefaults() {
-    return { ...DEFAULT_SETTINGS };
+    return { ...DEFAULT_SETTINGS, favorites: [] };
   }
 
   function profileCacheKey(userId) {
@@ -1901,9 +1938,11 @@
       displayName: data?.display_name || DEFAULT_SETTINGS.displayName,
       accent: data?.accent || DEFAULT_SETTINGS.accent,
       scanlines: typeof data?.scanlines === 'boolean' ? data.scanlines : DEFAULT_SETTINGS.scanlines,
-      credits: Number.isFinite(Number(data?.credits)) ? Number(data.credits) : DEFAULT_SETTINGS.credits
+      credits: Number.isFinite(Number(data?.credits)) ? Number(data.credits) : DEFAULT_SETTINGS.credits,
+      favorites: Array.isArray(data?.favorites) ? data.favorites : DEFAULT_SETTINGS.favorites
     };
     applySettingsToUI();
+    if (window.renderFavorites) window.renderFavorites();
   }
 
   function applySettingsToUI() {
@@ -1964,6 +2003,7 @@
     loggedInView.style.display = 'none';
     window.arcadeSettings = cloneDefaults();
     applySettingsToUI();
+    if (window.renderFavorites) window.renderFavorites();
     document.body.classList.add('gated');
   }
 
@@ -2007,7 +2047,8 @@
           display_name: DEFAULT_SETTINGS.displayName,
           accent: DEFAULT_SETTINGS.accent,
           scanlines: DEFAULT_SETTINGS.scanlines,
-          credits: DEFAULT_SETTINGS.credits
+          credits: DEFAULT_SETTINGS.credits,
+          favorites: DEFAULT_SETTINGS.favorites
         };
         const insertResult = await withTimeout(supabaseClient.from('profiles').insert(defaults));
         if (insertResult.error) {
@@ -2107,6 +2148,12 @@
     if (currentUser) saveProfile({ credits: newCredits });
     else window.arcadeSettings.credits = newCredits;
     updateCreditsDisplay();
+  };
+
+  // Exposed so toggling a favorite star saves it to the account
+  // when logged in (guests just keep it in memory for the session).
+  window.persistFavorites = function (newFavorites) {
+    if (currentUser) saveProfile({ favorites: newFavorites });
   };
 
   // Auto-regen: everyone gets +20 credits every 5 minutes, whether
@@ -2381,9 +2428,12 @@
   const progressFill = document.getElementById('progressFill');
   const currentTimeLabel = document.getElementById('currentTimeLabel');
   const durationLabel = document.getElementById('durationLabel');
+  const closeMusicBtn = document.getElementById('closeMusicBtn');
+  const volumePercent = document.getElementById('volumePercent');
 
   const audioPlayer = new Audio();
   audioPlayer.volume = 0.6;
+  volumePercent.textContent = '60%';
   let currentTrackIndex = -1;
 
   TRACKS.forEach((track, i) => {
@@ -2488,6 +2538,7 @@
     audioPlayer.volume = pct / 100;
     volumeFill.style.width = pct + '%';
     volumeHandle.style.left = pct + '%';
+    volumePercent.textContent = Math.round(pct) + '%';
   }
 
   function pctFromEvent(e) {
@@ -2522,12 +2573,47 @@
 
   setVolume(60);
 
+  const updatesBtn = document.getElementById('updatesBtn');
+  const updatesOverlay = document.getElementById('updatesOverlay');
+  const closeUpdatesBtn = document.getElementById('closeUpdatesBtn');
+
+  function setUpdatesOpen(open) {
+    updatesOverlay.classList.toggle('open', open);
+    updatesOverlay.setAttribute('aria-hidden', String(!open));
+  }
+
+  updatesBtn.addEventListener('click', () => setUpdatesOpen(true));
+  closeUpdatesBtn.addEventListener('click', () => setUpdatesOpen(false));
+
+  updatesOverlay.addEventListener('click', (event) => {
+    if (event.target === updatesOverlay) setUpdatesOpen(false);
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      if (updatesOverlay.classList.contains('open')) setUpdatesOpen(false);
+      if (musicOverlay.classList.contains('open')) {
+        musicOverlay.classList.remove('open');
+        musicOverlay.setAttribute('aria-hidden', 'true');
+      }
+    }
+  });
+
+  closeMusicBtn.addEventListener('click', () => {
+    musicOverlay.classList.remove('open');
+    musicOverlay.setAttribute('aria-hidden', 'true');
+  });
+
   musicBtn.addEventListener('click', () => {
     musicOverlay.classList.add('open');
+    musicOverlay.setAttribute('aria-hidden', 'false');
   });
 
   musicOverlay.addEventListener('click', (e) => {
-    if (e.target === musicOverlay) musicOverlay.classList.remove('open');
+    if (e.target === musicOverlay) {
+      musicOverlay.classList.remove('open');
+      musicOverlay.setAttribute('aria-hidden', 'true');
+    }
   });
 </script>
 
@@ -2741,16 +2827,114 @@
     const btn = document.createElement('button');
     btn.className = 'game-button';
     btn.dataset.src = gameLinks[i - 1] || `games/game-${num}.html`;
+    btn.dataset.slot = String(i);
     btn.innerHTML = `
       ${controllerIcon}
       <span class="slot-number">${num}</span>
       <span class="slot-label">${label}</span>
     `;
+
+    const star = document.createElement('button');
+    star.type = 'button';
+    star.className = 'fav-star';
+    star.dataset.slot = String(i);
+    star.setAttribute('aria-label', 'Toggle favorite');
+    star.innerHTML = '★';
+    star.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleFavorite(i);
+    });
+    btn.appendChild(star);
+
     li.appendChild(btn);
     list.appendChild(li);
   }
 
+  const gameSearch = document.getElementById('gameSearch');
+  const searchStatus = document.getElementById('searchStatus');
+  const noSearchResults = document.getElementById('noSearchResults');
+
+  function filterGames() {
+    const query = gameSearch.value.trim().toLowerCase();
+    const gameItems = Array.from(list.querySelectorAll('li'));
+    let visibleCount = 0;
+
+    gameItems.forEach((item) => {
+      const label = item.querySelector('.slot-label');
+      const name = label ? label.textContent.trim().toLowerCase() : '';
+      const matches = !query || name.includes(query);
+      item.classList.toggle('search-hidden', !matches);
+      if (matches) visibleCount++;
+    });
+
+    searchStatus.textContent = `${visibleCount} ${visibleCount === 1 ? 'GAME' : 'GAMES'}`;
+    noSearchResults.hidden = visibleCount !== 0;
+  }
+
+  gameSearch.addEventListener('input', filterGames);
+  filterGames();
+
   const buttons = document.querySelectorAll('.game-button');
+
+  const favoritesList = document.getElementById('favoritesList');
+
+  function refreshFavoriteStars() {
+    const favs = window.arcadeSettings.favorites || [];
+    document.querySelectorAll('.fav-star').forEach(star => {
+      const slot = Number(star.dataset.slot);
+      star.classList.toggle('favorited', favs.includes(slot));
+    });
+  }
+
+  window.toggleFavorite = function (slot) {
+    const favs = window.arcadeSettings.favorites || [];
+    const idx = favs.indexOf(slot);
+    let newFavs;
+    if (idx === -1) {
+      newFavs = [...favs, slot];
+    } else {
+      newFavs = favs.filter(s => s !== slot);
+    }
+    window.arcadeSettings.favorites = newFavs;
+    if (window.persistFavorites) window.persistFavorites(newFavs);
+    refreshFavoriteStars();
+    window.renderFavorites();
+  };
+
+  window.renderFavorites = function () {
+    const favs = window.arcadeSettings.favorites || [];
+    favoritesList.innerHTML = '';
+
+    if (favs.length === 0) {
+      favoritesList.innerHTML = '<div class="favorites-empty">No favorites yet -- click the star on any game to add it here.</div>';
+      refreshFavoriteStars();
+      return;
+    }
+
+    favs.forEach(slot => {
+      const mainBtn = document.querySelector(`.game-button[data-slot="${slot}"]`);
+      if (!mainBtn) return;
+      const label = mainBtn.querySelector('.slot-label').textContent;
+      const num = mainBtn.querySelector('.slot-number').textContent;
+
+      const li = document.createElement('li');
+      const btn = document.createElement('button');
+      btn.className = 'game-button';
+      btn.innerHTML = `
+        ${controllerIcon}
+        <span class="slot-number">${num}</span>
+        <span class="slot-label">${label}</span>
+      `;
+      btn.addEventListener('click', () => mainBtn.click());
+      li.appendChild(btn);
+      favoritesList.appendChild(li);
+    });
+
+    refreshFavoriteStars();
+  };
+
+  refreshFavoriteStars();
+  window.renderFavorites();
 
   buttons.forEach(btn => {
     btn.addEventListener('click', () => {

@@ -639,6 +639,186 @@
     box-shadow: 0 1px 0 rgba(0,0,0,0.45);
   }
 
+
+  /* ============== SHOP BUTTON + SHOP OVERLAY ============== */
+  #shopBtn {
+    position: fixed;
+    top: 20px;
+    left: 330px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: linear-gradient(155deg, var(--panel-hover), var(--panel));
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    color: var(--gold);
+    font-family: 'Press Start 2P', monospace;
+    font-size: .6rem;
+    letter-spacing: .04em;
+    cursor: pointer;
+    box-shadow: 0 3px 0 rgba(0,0,0,.45), 0 0 12px rgba(255,207,77,.22);
+    transition: border-color .15s ease, transform .1s ease, box-shadow .15s ease;
+  }
+  #shopBtn:hover, #shopBtn:focus-visible {
+    border-color: var(--gold);
+    outline: none;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 rgba(0,0,0,.45), 0 0 18px rgba(255,207,77,.42);
+  }
+  #shopBtn:active { transform: translateY(0); }
+  body.gated #shopBtn { display:none; }
+
+  #shopOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: radial-gradient(circle at 50% 30%, rgba(255,207,77,.08), transparent 35%), rgba(4,3,10,.86);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+  }
+  #shopOverlay.open { display:flex; }
+
+  #shopPanel {
+    width:100%;
+    max-width:720px;
+    max-height:88vh;
+    overflow-y:auto;
+    position:relative;
+    padding:26px;
+    background:linear-gradient(145deg, rgba(30,22,51,.98), rgba(10,8,20,.98));
+    border:2px solid var(--gold);
+    border-radius:22px;
+    box-shadow:0 0 0 1px rgba(51,255,240,.22), 0 0 45px rgba(255,207,77,.20), 0 28px 80px rgba(0,0,0,.55);
+  }
+  #shopPanel::before {
+    content:'';
+    position:absolute;
+    inset:8px;
+    border:1px solid rgba(51,255,240,.12);
+    border-radius:16px;
+    pointer-events:none;
+  }
+  #shopPanel h2 {
+    position:relative;
+    margin:0 0 8px;
+    color:var(--gold);
+    text-shadow:0 0 10px rgba(255,207,77,.65);
+    font:700 .95rem 'Press Start 2P',monospace;
+    letter-spacing:.04em;
+  }
+  .shop-subtitle {
+    position:relative;
+    color:var(--muted);
+    font-size:.76rem;
+    line-height:1.5;
+    margin-bottom:16px;
+  }
+  .shop-balance {
+    position:relative;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    padding:13px 15px;
+    margin-bottom:18px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:rgba(7,6,13,.58);
+  }
+  .shop-balance-label {
+    color:var(--muted);
+    font:700 .48rem 'Press Start 2P',monospace;
+    letter-spacing:.06em;
+  }
+  #shopCredits {
+    color:var(--gold);
+    font:700 .72rem 'Press Start 2P',monospace;
+    text-shadow:0 0 8px rgba(255,207,77,.55);
+  }
+  .shop-section-title {
+    position:relative;
+    margin:18px 0 9px;
+    color:var(--cyan);
+    font:700 .58rem 'Press Start 2P',monospace;
+    letter-spacing:.06em;
+  }
+  .shop-grid {
+    position:relative;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+  .shop-item {
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding:14px;
+    background:rgba(7,6,13,.58);
+    border:1px solid var(--line);
+    border-radius:12px;
+  }
+  .shop-item.owned { border-color:rgba(57,255,106,.55); }
+  .shop-item-name {
+    color:var(--text);
+    font-size:.82rem;
+    font-weight:900;
+  }
+  .shop-item-desc {
+    color:var(--muted);
+    font-size:.68rem;
+    line-height:1.45;
+    min-height:2.9em;
+  }
+  .shop-buy {
+    width:100%;
+    margin-top:auto;
+    padding:9px 10px;
+    border:2px solid var(--line);
+    border-radius:8px;
+    background:var(--panel-hover);
+    color:var(--gold);
+    font:700 .48rem 'Press Start 2P',monospace;
+    cursor:pointer;
+  }
+  .shop-buy:hover:not(:disabled) { border-color:var(--gold); box-shadow:0 0 12px rgba(255,207,77,.22); }
+  .shop-buy:disabled { opacity:.45; cursor:not-allowed; }
+  .shop-buy.owned { color:#39ff6a; border-color:#39ff6a; }
+  .shop-close {
+    position:relative;
+    width:100%;
+    margin-top:18px;
+    padding:12px;
+    border:2px solid var(--line);
+    border-radius:10px;
+    background:var(--panel-hover);
+    color:var(--text);
+    font-family:'Press Start 2P',monospace;
+    font-size:.55rem;
+    cursor:pointer;
+  }
+  .shop-item-icon { width:42px; height:42px; display:grid; place-items:center; border:1px solid rgba(255,207,77,.35); border-radius:10px; color:var(--gold); background:rgba(255,207,77,.06); font-family:'Press Start 2P',monospace; font-size:.65rem; margin-bottom:10px; }
+  .shop-item.owned { border-color:rgba(51,255,240,.45); box-shadow:0 0 18px rgba(51,255,240,.08); }
+  .shop-buy.locked { opacity:.52; cursor:not-allowed; }
+  .shop-buy.owned { border-color:var(--cyan); color:var(--cyan); background:rgba(51,255,240,.08); }
+  .shop-rainbow-name { background:linear-gradient(90deg,#ff2e88,#ffcf4d,#39ff14,#33fff0,#8b5cf6,#ff2e88); background-size:300% 100%; -webkit-background-clip:text; background-clip:text; color:transparent !important; animation:shopRainbow 3s linear infinite; }
+  .shop-diamond-name { color:#dffcff !important; text-shadow:0 0 5px #fff,0 0 12px #33fff0,0 0 22px #8b5cf6; }
+  .shop-fire-name { color:#ffcf4d !important; text-shadow:0 0 5px #ffcf4d,0 0 12px #ff7a18,0 0 22px #ff2e88; }
+  @keyframes shopRainbow { to { background-position:300% 0; } }
+
+  .shop-close:hover { border-color:var(--pink); color:var(--pink); }
+  @media (max-width:700px) {
+    #shopBtn { left:238px; top:12px; font-size:.48rem; padding:9px 10px; }
+    .shop-grid { grid-template-columns:1fr; }
+    #shopPanel { padding:20px; }
+  }
+
   /* ============== UPDATE BUTTON + LOG ============== */
   #updatesBtn {
     position: fixed;
@@ -1019,6 +1199,96 @@
   body.contrast-soft {
     --bg: #0c121c;
     --panel: #111a27;
+  }
+
+  .equipped-preview {
+    margin-top: 8px;
+    padding: 12px;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    background: var(--bg);
+    text-align: center;
+  }
+
+  .profile-badge-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 5px;
+  font-size: 0.9rem;
+  line-height: 1;
+  vertical-align: middle;
+  filter: drop-shadow(0 0 5px currentColor);
+}
+
+.equipped-preview-name {
+    font-family: 'Press Start 2P', monospace;
+    font-size: .7rem;
+    line-height: 1.6;
+    word-break: break-word;
+  }
+
+  .equip-grid {
+    display: grid;
+    gap: 8px;
+  }
+
+  .equip-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(255,255,255,.02);
+  }
+
+  .equip-row-name {
+    min-width: 0;
+    color: var(--text);
+    font-size: .68rem;
+    font-weight: 700;
+  }
+
+  .equip-row-type {
+    display: block;
+    color: var(--muted);
+    font-size: .56rem;
+    margin-top: 3px;
+    font-weight: 500;
+  }
+
+  .equip-btn {
+    flex: 0 0 auto;
+    padding: 7px 9px;
+    border: 2px solid var(--line);
+    border-radius: 7px;
+    background: var(--panel-hover);
+    color: var(--text);
+    font-family: 'Press Start 2P', monospace;
+    font-size: .45rem;
+    cursor: pointer;
+  }
+
+  .equip-btn:hover:not(:disabled) {
+    border-color: var(--cyan);
+    color: var(--cyan);
+    box-shadow: 0 0 10px rgba(51,255,240,.18);
+  }
+
+  .equip-btn.equipped {
+    border-color: #39ff6a;
+    color: #39ff6a;
+    background: rgba(57,255,106,.07);
+  }
+
+  .equip-empty {
+    color: var(--muted);
+    font-size: .65rem;
+    line-height: 1.5;
+    text-align: center;
+    padding: 10px;
   }
 
   .settings-choice-desc {
@@ -1509,6 +1779,56 @@
   UPDATES
 </button>
 
+<button id="shopBtn" type="button" aria-label="Open arcade shop">
+  <span>◆</span>
+  SHOP
+</button>
+
+<div id="shopOverlay" aria-hidden="true">
+  <div id="shopPanel" role="dialog" aria-modal="true" aria-labelledby="shopTitle">
+    <h2 id="shopTitle">ARCADE SHOP</h2>
+    <div class="shop-subtitle">Build up credits, then unlock rare cosmetics, titles, badges, name effects, and exclusive accent colors. Higher-tier items stay locked until you have enough credits.</div>
+
+    <div class="shop-balance">
+      <span class="shop-balance-label">YOUR BALANCE</span>
+      <span id="shopCredits">20 CREDITS</span>
+    </div>
+
+    <div class="shop-section-title">PROFILE COSMETICS</div>
+    <div class="shop-grid">
+      <div class="shop-item" data-shop-id="name-purple"><div class="shop-item-icon">◆</div><div class="shop-item-name">PURPLE NAME</div><div class="shop-item-desc">Turn your name into a purple arcade tag.</div><button class="shop-buy" type="button" data-shop-id="name-purple" data-cost="50">50 CREDITS</button></div>
+      <div class="shop-item" data-shop-id="name-gold"><div class="shop-item-icon">★</div><div class="shop-item-name">GOLD NAME</div><div class="shop-item-desc">Give your name a gold arcade glow.</div><button class="shop-buy" type="button" data-shop-id="name-gold" data-cost="50">50 CREDITS</button></div>
+      <div class="shop-item" data-shop-id="name-pink"><div class="shop-item-icon">♥</div><div class="shop-item-name">PINK NAME</div><div class="shop-item-desc">Make your name pop with a hot-pink tag.</div><button class="shop-buy" type="button" data-shop-id="name-pink" data-cost="50">50 CREDITS</button></div>
+      <div class="shop-item" data-shop-id="name-green"><div class="shop-item-icon">✦</div><div class="shop-item-name">NEON GREEN NAME</div><div class="shop-item-desc">Unlock an electric green player name.</div><button class="shop-buy" type="button" data-shop-id="name-green" data-cost="50">50 CREDITS</button></div>
+      <div class="shop-item" data-shop-id="name-frame"><div class="shop-item-icon">▣</div><div class="shop-item-name">GLOWING NAME FRAME</div><div class="shop-item-desc">A bright frame surrounds your name in AI chat.</div><button class="shop-buy" type="button" data-shop-id="name-frame" data-cost="75">75 CREDITS</button></div>
+      <div class="shop-item" data-shop-id="effect-diamond"><div class="shop-item-icon">◇</div><div class="shop-item-name">DIAMOND NAME</div><div class="shop-item-desc">A shimmering diamond effect for your chat name.</div><button class="shop-buy" type="button" data-shop-id="effect-diamond" data-cost="125">125 CREDITS</button></div>
+      <div class="shop-item" data-shop-id="effect-rainbow"><div class="shop-item-icon">🌈</div><div class="shop-item-name">RAINBOW NAME</div><div class="shop-item-desc">Animated arcade colors cycle across your name.</div><button class="shop-buy" type="button" data-shop-id="effect-rainbow" data-cost="175">175 CREDITS</button></div>
+      <div class="shop-item" data-shop-id="effect-fire"><div class="shop-item-icon">🔥</div><div class="shop-item-name">FIRE NAME</div><div class="shop-item-desc">A fiery glow makes your player tag stand out.</div><button class="shop-buy" type="button" data-shop-id="effect-fire" data-cost="200">200 CREDITS</button></div>
+    </div>
+
+    <div class="shop-section-title">TITLE TAGS</div>
+    <div class="shop-grid">
+      <div class="shop-item" data-shop-id="title-veteran"><div class="shop-item-icon">🕹️</div><div class="shop-item-name">ARCADE VETERAN</div><div class="shop-item-desc">Show the classic veteran title beside your name.</div><button class="shop-buy" type="button" data-shop-id="title-veteran" data-cost="100">100 CREDITS</button></div>
+      <div class="shop-item" data-shop-id="title-champion"><div class="shop-item-icon">🏆</div><div class="shop-item-name">SCORE CHASER</div><div class="shop-item-desc">Wear a title for players who chase high scores.</div><button class="shop-buy" type="button" data-shop-id="title-champion" data-cost="100">100 CREDITS</button></div>
+      <div class="shop-item" data-shop-id="title-pixel"><div class="shop-item-icon">👾</div><div class="shop-item-name">PIXEL PILOT</div><div class="shop-item-desc">A retro title for your arcade profile.</div><button class="shop-buy" type="button" data-shop-id="title-pixel" data-cost="100">100 CREDITS</button></div>
+      <div class="shop-item" data-shop-id="title-master"><div class="shop-item-icon">⚡</div><div class="shop-item-name">ARCADE MASTER</div><div class="shop-item-desc">A premium title reserved for a big credit stash.</div><button class="shop-buy" type="button" data-shop-id="title-master" data-cost="300">300 CREDITS</button></div>
+      <div class="shop-item" data-shop-id="badge-vip"><div class="shop-item-icon">👑</div><div class="shop-item-name">VIP BADGE</div><div class="shop-item-desc">Adds a VIP badge beside your title in chat.</div><button class="shop-buy" type="button" data-shop-id="badge-vip" data-cost="250">250 CREDITS</button></div>
+      <div class="shop-item" data-shop-id="badge-glitch"><div class="shop-item-icon">👾</div><div class="shop-item-name">GLITCH BADGE</div><div class="shop-item-desc">A rare glitch badge for serious arcade collectors.</div><button class="shop-buy" type="button" data-shop-id="badge-glitch" data-cost="400">400 CREDITS</button></div>
+    </div>
+
+    <div class="shop-section-title">EXTRA ACCENT COLORS</div>
+    <div class="shop-grid">
+      <div class="shop-item" data-shop-id="accent-crimson"><div class="shop-item-icon">●</div><div class="shop-item-name">CRIMSON</div><div class="shop-item-desc">Unlock a deep crimson accent in Settings.</div><button class="shop-buy" type="button" data-shop-id="accent-crimson" data-cost="150">150 CREDITS</button></div>
+      <div class="shop-item" data-shop-id="accent-electric"><div class="shop-item-icon">◆</div><div class="shop-item-name">ELECTRIC PURPLE</div><div class="shop-item-desc">Unlock a vivid electric-purple interface accent.</div><button class="shop-buy" type="button" data-shop-id="accent-electric" data-cost="150">150 CREDITS</button></div>
+      <div class="shop-item" data-shop-id="accent-coral"><div class="shop-item-icon">●</div><div class="shop-item-name">CORAL</div><div class="shop-item-desc">Unlock a bright coral arcade accent.</div><button class="shop-buy" type="button" data-shop-id="accent-coral" data-cost="150">150 CREDITS</button></div>
+      <div class="shop-item" data-shop-id="accent-ultraviolet"><div class="shop-item-icon">✦</div><div class="shop-item-name">ULTRAVIOLET</div><div class="shop-item-desc">Unlock a deep ultraviolet accent.</div><button class="shop-buy" type="button" data-shop-id="accent-ultraviolet" data-cost="150">150 CREDITS</button></div>
+      <div class="shop-item" data-shop-id="badge-arcade"><div class="shop-item-icon">🕹️</div><div class="shop-item-name">ARCADE BADGE</div><div class="shop-item-desc">A small diamond badge for your player name.</div><button class="shop-buy" type="button" data-shop-id="badge-arcade" data-cost="75">75 CREDITS</button></div>
+    </div>
+
+    <button type="button" class="shop-close" id="closeShopBtn">CLOSE SHOP</button>
+  </div>
+</div>
+
 <div id="updatesOverlay" aria-hidden="true">
   <div id="updatesPanel" role="dialog" aria-modal="true" aria-labelledby="updatesTitle">
     <h2 id="updatesTitle">UPDATE LOG</h2>
@@ -1523,6 +1843,12 @@
       <div class="update-date">LATEST BUILD</div>
       <div class="update-title">Update Log</div>
       <div class="update-desc">Click UPDATES at the top of the arcade to view the latest changes.</div>
+    </div>
+
+    <div class="update-entry">
+      <div class="update-date">LATEST BUILD</div>
+      <div class="update-title">Arcade Shop</div>
+      <div class="update-desc">Spend saved credits on name colors, glowing chat frames, profile titles, and extra accent colors.</div>
     </div>
 
     <div class="update-entry">
@@ -1717,6 +2043,15 @@
       <div class="settings-choice-desc">Change how deep or soft the arcade background feels.</div>
     </div>
 
+    <div class="field">
+      <label>Equipped Cosmetics</label>
+      <div class="equipped-preview">
+        <div class="equipped-preview-name" id="equippedPreviewName">You</div>
+        <div id="equippedPreviewMeta" style="font-size:.58rem;color:var(--muted);margin-top:6px;">No cosmetics equipped</div>
+      </div>
+      <div class="equip-grid" id="equipGrid" style="margin-top:10px;"></div>
+    </div>
+
     <div class="panel-buttons">
       <button type="button" id="closeSettingsBtn">Cancel</button>
       <button type="button" id="saveSettingsBtn">Save</button>
@@ -1779,6 +2114,254 @@
   let authServiceOffline = !supabaseClient;
   let profileSaveTimer = null;
 
+
+  const SHOP_KEY_PREFIX = 'arcade_shop_v1_';
+  const SHOP_ACCENT_COLORS = {
+    'accent-crimson': { name: 'CRIMSON', color: '#e11d48' },
+    'accent-electric': { name: 'ELECTRIC PURPLE', color: '#8b5cf6' },
+    'accent-coral': { name: 'CORAL', color: '#fb7185' },
+    'accent-ultraviolet': { name: 'ULTRAVIOLET', color: '#7c3aed' }
+  };
+
+  const DEFAULT_COSMETICS = {
+    owned: [],
+    nameColor: null,
+    nameFrame: false,
+    title: null,
+    nameEffect: null,
+    chatBadge: null
+  };
+
+  function shopStorageKey() {
+    return SHOP_KEY_PREFIX + (currentUser?.id || 'guest');
+  }
+
+  function readShopData() {
+    try {
+      const raw = localStorage.getItem(shopStorageKey());
+      const parsed = raw ? JSON.parse(raw) : {};
+      return {
+        owned: Array.isArray(parsed.owned) ? [...new Set(parsed.owned)] : [],
+        nameColor: typeof parsed.nameColor === 'string' ? parsed.nameColor : null,
+        nameFrame: parsed.nameFrame === true,
+        title: typeof parsed.title === 'string' ? parsed.title : null,
+        nameEffect: typeof parsed.nameEffect === 'string' ? parsed.nameEffect : null,
+        chatBadge: typeof parsed.chatBadge === 'string' ? parsed.chatBadge : null
+      };
+    } catch (_) {
+      return { ...DEFAULT_COSMETICS, owned: [] };
+    }
+  }
+
+  let shopData = { ...DEFAULT_COSMETICS, owned: [] };
+
+  function saveShopData() {
+    try {
+      localStorage.setItem(shopStorageKey(), JSON.stringify(shopData));
+    } catch (_) {}
+  }
+
+  function getActiveTitle() {
+    const titles = {
+      'title-veteran': '🕹️ Arcade Veteran',
+      'title-champion': '🏆 Score Chaser',
+      'title-pixel': '👾 Pixel Pilot',
+      'title-master': '⚡ Arcade Master'
+    };
+    return titles[shopData.title] || '';
+  }
+
+  function getNameColor() {
+    const colors = {
+      'name-purple': '#b070ff',
+      'name-gold': '#ffcf4d',
+      'name-pink': '#ff2e88',
+      'name-green': '#39ff14'
+    };
+    return colors[shopData.nameColor] || 'var(--text)';
+  }
+
+  function getNameEffectClass() {
+    return ({
+      'effect-rainbow': 'shop-rainbow-name',
+      'effect-diamond': 'shop-diamond-name',
+      'effect-fire': 'shop-fire-name'
+    })[shopData.nameEffect] || '';
+  }
+
+  function getChatBadge() {
+    return ({
+      'badge-arcade': '🕹️',
+      'badge-vip': '👑',
+      'badge-glitch': '👾'
+    })[shopData.chatBadge] || '';
+  }
+
+  const SHOP_EQUIP_ITEMS = [
+    { id: 'name-purple', label: 'Purple Username', type: 'Username color' },
+    { id: 'name-gold', label: 'Gold Username', type: 'Username color' },
+    { id: 'name-pink', label: 'Pink Username', type: 'Username color' },
+    { id: 'name-green', label: 'Neon Green Username', type: 'Username color' },
+    { id: 'name-frame', label: 'Glowing Name Frame', type: 'Name frame' },
+    { id: 'effect-diamond', label: 'Diamond Name', type: 'Name effect' },
+    { id: 'effect-rainbow', label: 'Rainbow Name', type: 'Name effect' },
+    { id: 'effect-fire', label: 'Fire Name', type: 'Name effect' },
+    { id: 'title-veteran', label: '🕹️ Arcade Veteran', type: 'Title' },
+    { id: 'title-champion', label: '🏆 Score Chaser', type: 'Title' },
+    { id: 'title-pixel', label: '👾 Pixel Pilot', type: 'Title' },
+    { id: 'title-master', label: '⚡ Arcade Master', type: 'Title' },
+    { id: 'badge-arcade', label: '◆ Arcade Badge', type: 'Badge' },
+    { id: 'badge-vip', label: 'VIP Badge', type: 'Badge' },
+    { id: 'badge-glitch', label: 'GLITCH Badge', type: 'Badge' }
+  ];
+
+  function equipShopItem(id) {
+    if (!shopData.owned.includes(id)) return;
+
+    if (id.startsWith('name-') && id !== 'name-frame') {
+      shopData.nameColor = id;
+    } else if (id === 'name-frame') {
+      shopData.nameFrame = !shopData.nameFrame;
+    } else if (id.startsWith('effect-')) {
+      shopData.nameEffect = shopData.nameEffect === id ? null : id;
+    } else if (id.startsWith('title-')) {
+      shopData.title = shopData.title === id ? null : id;
+    } else if (id.startsWith('badge-')) {
+      shopData.chatBadge = shopData.chatBadge === id ? null : id;
+    }
+
+    saveShopData();
+    renderEquippedCosmetics();
+  }
+
+  function isShopItemEquipped(id) {
+    if (id.startsWith('name-') && id !== 'name-frame') return shopData.nameColor === id;
+    if (id === 'name-frame') return shopData.nameFrame === true;
+    if (id.startsWith('effect-')) return shopData.nameEffect === id;
+    if (id.startsWith('title-')) return shopData.title === id;
+    if (id.startsWith('badge-')) return shopData.chatBadge === id;
+    return false;
+  }
+
+  function renderEquippedCosmetics() {
+    if (!equipGrid) return;
+    const owned = SHOP_EQUIP_ITEMS.filter(item => shopData.owned.includes(item.id));
+    equipGrid.innerHTML = '';
+
+    if (!owned.length) {
+      equipGrid.innerHTML = '<div class="equip-empty">Buy a cosmetic in the Shop first, then come back here to equip it.</div>';
+    } else {
+      owned.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'equip-row';
+        const info = document.createElement('div');
+        info.className = 'equip-row-name';
+        info.innerHTML = `${item.label}<span class="equip-row-type">${item.type}</span>`;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'equip-btn' + (isShopItemEquipped(item.id) ? ' equipped' : '');
+        button.textContent = isShopItemEquipped(item.id) ? 'EQUIPPED' : 'EQUIP';
+        button.addEventListener('click', () => equipShopItem(item.id));
+        row.append(info, button);
+        equipGrid.appendChild(row);
+      });
+    }
+
+    if (equippedPreviewName) {
+      equippedPreviewName.textContent = window.arcadeSettings.displayName || 'You';
+      equippedPreviewName.style.color = getNameColor();
+      equippedPreviewName.className = 'equipped-preview-name';
+      const effect = getNameEffectClass();
+      if (effect) equippedPreviewName.classList.add(effect);
+      if (shopData.nameFrame) {
+        equippedPreviewName.style.display = 'inline-block';
+        equippedPreviewName.style.padding = '3px 8px';
+        equippedPreviewName.style.border = '1px solid ' + getNameColor();
+        equippedPreviewName.style.borderRadius = '7px';
+        equippedPreviewName.style.boxShadow = '0 0 9px ' + getNameColor();
+      }
+    }
+
+    if (equippedPreviewMeta) {
+      const parts = [];
+      const previewBadge = getChatBadge();
+      if (previewBadge) parts.push(previewBadge + ' Badge');
+      if (shopData.nameColor) parts.push(shopData.nameColor.replace('name-', '').toUpperCase() + ' NAME');
+      if (shopData.nameEffect) parts.push(shopData.nameEffect.replace('effect-', '').toUpperCase() + ' EFFECT');
+      if (shopData.nameFrame) parts.push('FRAME');
+      if (getActiveTitle()) parts.push(getActiveTitle());
+      if (getChatBadge()) parts.push(getChatBadge() + ' BADGE');
+      equippedPreviewMeta.textContent = parts.length ? 'EQUIPPED: ' + parts.join(' • ') : 'No cosmetics equipped';
+    }
+  }
+
+  function applyOwnedAccentColors() {
+    const ownedAccents = Object.keys(SHOP_ACCENT_COLORS).filter(id => shopData.owned.includes(id));
+    ownedAccents.forEach(id => {
+      if (swatchRow.querySelector(`[data-shop-accent="${id}"]`)) return;
+      const item = SHOP_ACCENT_COLORS[id];
+      const swatch = document.createElement('button');
+      swatch.type = 'button';
+      swatch.className = 'swatch';
+      swatch.dataset.color = item.color;
+      swatch.dataset.shopAccent = id;
+      swatch.style.background = item.color;
+      swatch.style.color = item.color;
+      swatch.setAttribute('aria-label', item.name + ' (SHOP)');
+      swatch.title = item.name + ' (SHOP)';
+      swatchRow.appendChild(swatch);
+    });
+    swatchRow.querySelectorAll('.swatch').forEach(s => {
+      s.classList.toggle('selected', s.dataset.color === window.arcadeSettings.accent);
+    });
+  }
+
+  function updateShopUI() {
+    const balance = Math.max(0, Number(window.arcadeSettings.credits) || 0);
+    const shopCredits = document.getElementById('shopCredits');
+    if (shopCredits) shopCredits.textContent = `${balance} ${balance === 1 ? 'CREDIT' : 'CREDITS'}`;
+
+    renderEquippedCosmetics();
+
+    document.querySelectorAll('.shop-buy').forEach(btn => {
+      const id = btn.dataset.shopId;
+      const owned = shopData.owned.includes(id);
+      const cost = Number(btn.dataset.cost) || 0;
+      const affordable = balance >= cost;
+      btn.disabled = owned || !affordable;
+      btn.classList.toggle('owned', owned);
+      btn.classList.toggle('locked', !owned && !affordable);
+      btn.textContent = owned ? 'OWNED' : (affordable ? `${cost} CREDITS` : `🔒 NEED ${cost - balance} MORE`);
+      const card = btn.closest('.shop-item');
+      if (card) card.classList.toggle('owned', owned);
+    });
+  }
+
+  function loadShopData() {
+    shopData = readShopData();
+    applyOwnedAccentColors();
+    updateShopUI();
+  }
+
+  function purchaseShopItem(id, cost) {
+    if (shopData.owned.includes(id)) return;
+    const balance = Number(window.arcadeSettings.credits) || 0;
+    if (balance < cost) {
+      updateShopUI();
+      return;
+    }
+
+    const newBalance = balance - cost;
+    shopData.owned = [...new Set([...shopData.owned, id])];
+
+    saveShopData();
+    if (window.persistCredits) window.persistCredits(newBalance);
+    else window.arcadeSettings.credits = newBalance;
+
+    if (id.startsWith('accent-')) applyOwnedAccentColors();
+    updateShopUI();
+  }
+
   const DEFAULT_SETTINGS = {
     displayName: 'You',
     accent: '#33fff0',
@@ -1811,6 +2394,9 @@
   const loginBtn = document.getElementById('loginBtn');
   const signupBtn = document.getElementById('signupBtn');
   const logoutBtn = document.getElementById('logoutBtn');
+  const equipGrid = document.getElementById('equipGrid');
+  const equippedPreviewName = document.getElementById('equippedPreviewName');
+  const equippedPreviewMeta = document.getElementById('equippedPreviewMeta');
 
   const gateEmail = document.getElementById('gateEmail');
   const gatePassword = document.getElementById('gatePassword');
@@ -1953,6 +2539,8 @@
     scanlineToggle.classList.toggle('on', window.arcadeSettings.scanlines);
     document.body.classList.toggle('no-scanlines', !window.arcadeSettings.scanlines);
     updateCreditsDisplay();
+    applyOwnedAccentColors();
+    updateShopUI();
   }
 
   function isNetworkError(error) {
@@ -1981,6 +2569,7 @@
 
   function enterGuestMode(message) {
     currentUser = null;
+    loadShopData();
     loggedOutView.style.display = 'block';
     loggedInView.style.display = 'none';
     document.body.classList.remove('gated');
@@ -1991,6 +2580,7 @@
 
   function showLoggedIn(user) {
     currentUser = user;
+    loadShopData();
     loggedOutView.style.display = 'none';
     loggedInView.style.display = 'block';
     loggedInEmail.textContent = user.email || 'Signed in';
@@ -1999,6 +2589,7 @@
 
   function showLoggedOut() {
     currentUser = null;
+    loadShopData();
     loggedOutView.style.display = 'block';
     loggedInView.style.display = 'none';
     window.arcadeSettings = cloneDefaults();
@@ -2167,8 +2758,33 @@
     window.persistCredits(newTotal);
   }, CREDIT_REGEN_INTERVAL_MS);
 
+  const shopBtn = document.getElementById('shopBtn');
+  const shopOverlay = document.getElementById('shopOverlay');
+  const closeShopBtn = document.getElementById('closeShopBtn');
+
+  function setShopOpen(open) {
+    shopOverlay.classList.toggle('open', open);
+    shopOverlay.setAttribute('aria-hidden', String(!open));
+    if (open) updateShopUI();
+  }
+
+  shopBtn.addEventListener('click', () => setShopOpen(true));
+  closeShopBtn.addEventListener('click', () => setShopOpen(false));
+  shopOverlay.addEventListener('click', (event) => {
+    if (event.target === shopOverlay) setShopOpen(false);
+  });
+
+  document.querySelectorAll('.shop-buy').forEach(btn => {
+    btn.addEventListener('click', () => {
+      purchaseShopItem(btn.dataset.shopId, Number(btn.dataset.cost) || 0);
+    });
+  });
+
+  loadShopData();
+
   async function runAuthAction(action, gateOnly = false) {
-    if (!supabaseClient) {
+  
+  if (!supabaseClient) {
       markSupabaseOffline('Account service is unavailable right now. The arcade is still available in guest mode.');
       return null;
     }
@@ -2592,6 +3208,7 @@
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
       if (updatesOverlay.classList.contains('open')) setUpdatesOpen(false);
+      if (shopOverlay.classList.contains('open')) setShopOpen(false);
       if (musicOverlay.classList.contains('open')) {
         musicOverlay.classList.remove('open');
         musicOverlay.setAttribute('aria-hidden', 'true');
@@ -3017,7 +3634,38 @@
     div.className = 'msg ' + (sender === 'me' ? 'me' : 'them') + (isTyping ? ' typing' : '');
     const senderSpan = document.createElement('span');
     senderSpan.className = 'sender';
-    senderSpan.textContent = sender === 'me' ? 'You' : 'Gabe';
+    senderSpan.textContent = sender === 'me' ? (window.arcadeSettings.displayName || 'You') : 'Gabe';
+    if (sender === 'me') {
+      senderSpan.style.color = getNameColor();
+      const nameEffectClass = getNameEffectClass();
+      if (nameEffectClass) senderSpan.classList.add(nameEffectClass);
+      const badge = getChatBadge();
+      if (badge) {
+        const badgeSpan = document.createElement('span');
+        badgeSpan.className = 'profile-badge-icon';
+        badgeSpan.textContent = badge;
+        badgeSpan.title = shopData.chatBadge === 'badge-vip' ? 'VIP Badge' : (shopData.chatBadge === 'badge-glitch' ? 'Glitch Badge' : 'Arcade Badge');
+        badgeSpan.setAttribute('aria-label', badgeSpan.title);
+        senderSpan.appendChild(badgeSpan);
+      }
+      if (shopData.nameFrame) {
+        senderSpan.style.display = 'inline-block';
+        senderSpan.style.padding = '2px 7px';
+        senderSpan.style.border = '1px solid ' + getNameColor();
+        senderSpan.style.borderRadius = '7px';
+        senderSpan.style.boxShadow = '0 0 9px ' + getNameColor();
+      }
+      const title = getActiveTitle();
+      if (title) {
+        const titleSpan = document.createElement('span');
+        titleSpan.textContent = ' ' + title;
+        titleSpan.style.color = 'var(--gold)';
+        titleSpan.style.marginLeft = '6px';
+        titleSpan.style.fontSize = '0.58rem';
+        titleSpan.style.opacity = '0.9';
+        senderSpan.appendChild(titleSpan);
+      }
+    }
     div.appendChild(senderSpan);
     div.appendChild(document.createTextNode(text));
     log.appendChild(div);

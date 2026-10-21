@@ -3692,11 +3692,26 @@
         })
       });
 
-      const data = await response.json();
+      let data;
+      const responseText = await response.text();
+
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        data = {
+          error: 'The Worker returned a non-JSON response.',
+          details: responseText.slice(0, 500)
+        };
+      }
+
       typingEl.remove();
 
       if (!response.ok || data.error) {
-        addMessage('Error: ' + (data.error || 'The AI could not respond.'), 'them');
+        const errorParts = [data.error || 'The AI could not respond.'];
+        if (data.status) errorParts.push('HTTP ' + data.status);
+        else if (!response.ok) errorParts.push('HTTP ' + response.status);
+        if (data.details) errorParts.push(String(data.details).slice(0, 900));
+        addMessage('Error: ' + errorParts.join(' — '), 'them');
       } else if (typeof data.reply === 'string' && data.reply.trim()) {
         const reply = data.reply.trim();
         addMessage(reply, 'them');
@@ -3708,7 +3723,10 @@
       }
     } catch (err) {
       typingEl.remove();
-      addMessage('Something went wrong reaching Gabe. Check the Worker URL and Cloudflare settings.', 'them');
+      addMessage(
+        'Could not reach Gabe: ' + (err && err.message ? err.message : 'Network or CORS error. Check the Worker URL and Cloudflare settings.'),
+        'them'
+      );
     }
 
     statusLabel.textContent = 'online';

@@ -1750,9 +1750,48 @@
     border-radius: 4px;
     color: var(--pink);
   }
+
+  #maintenanceOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(7, 6, 13, 0.88);
+    backdrop-filter: blur(8px);
+  }
+
+  #maintenancePanel {
+    width: min(760px, 100%);
+    padding: clamp(32px, 8vw, 72px) 24px;
+    text-align: center;
+    background: linear-gradient(180deg, var(--panel) 0%, #100c1c 100%);
+    border: 3px solid var(--cyan);
+    border-radius: 20px;
+    box-shadow:
+      0 0 0 5px rgba(51, 255, 240, 0.12),
+      0 0 60px rgba(51, 255, 240, 0.24),
+      inset 0 0 40px rgba(255, 46, 136, 0.08);
+  }
+
+  #maintenancePanel h1 {
+    margin: 0;
+    color: var(--cyan);
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(1.25rem, 5vw, 2.5rem);
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
 </style>
 </head>
 <body class="gated">
+
+<div id="maintenanceOverlay" role="dialog" aria-modal="true" aria-labelledby="maintenanceTitle">
+  <div id="maintenancePanel">
+    <h1 id="maintenanceTitle">SITE IN MAINTENANCE</h1>
+  </div>
+</div>
 
 <div id="authGate">
   <div id="authGatePanel">
